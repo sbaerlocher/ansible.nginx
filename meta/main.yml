@@ -1,0 +1,15 @@
+---
+galaxy_info:
+  author: Simon Baerlocher <sbaerlocher@sbaerlocher.ch>
+  description: Install and configure Nginx.
+  license: license (MIT)
+  min_ansible_version: 1.2
+  platforms:
+  - name: Archlinux
+    versions:
+    - all
+  categories:
+  - system
+  - web
+
+dependencies: []

@@ -1,0 +1,94 @@
+# {{ ansible_managed }}
+# For more information on configuration, see:
+#   * Official English Documentation: http://nginx.org/en/docs/
+#   * Official Russian Documentation: http://nginx.org/ru/docs/
+
+user {{ nginx_default_user }};
+worker_processes {{ nginx_worker_processes }};
+pid /run/nginx.pid;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    # Sendfile copies data between one FD and other from within the kernel. 
+    # More efficient than read() + write(), since the requires transferring data to and from the user space.
+    sendfile            {{ nginx_sendfile }};
+
+    # Tcp_nopush causes nginx to attempt to send its HTTP response head in one packet, 
+    # instead of using partial frames. This is useful for prepending headers before calling sendfile, 
+    # or for throughput optimization.
+    tcp_nopush          {{ nginx_tcp_nopush }};
+
+    # don't buffer data-sends (disable Nagle algorithm). Good for sending frequent small bursts of data in real time.
+    tcp_nodelay         {{ nginx_tcp_nodelay }};
+
+    # don't display who we are
+    server_tokens       {{ nginx_server_tokens }};
+
+    # Timeout for keep-alive connections. Server will close connections after this time.
+    keepalive_timeout   {{ nginx_keepalive_timeout}};
+
+    # Number of requests a client can make over the keep-alive connection
+    keepalive_requests  {{ nginx_keepalive_requests }};
+
+    # allow the server to close the connection after a client stops responding. Frees up socket-associated memory.
+    reset_timedout_connection   {{ nginx_reset_timedout_connection }};
+
+    client_header_timeout       {{ nginx_client_header_timeout }};
+    client_body_timeout         {{ nginx_client_body_timeout }};
+    send_timeout                {{ nginx_send_timeout }};
+
+    client_max_body_size        {{ nginx_client_max_body_size }};
+    connection_pool_size        {{ nginx_connection_pool_size }};
+    client_body_buffer_size     {{ nginx_client_body_buffer_size }};
+    client_header_buffer_size   {{ nginx_client_header_buffer_size }};
+    large_client_header_buffers {{ nginx_large_client_header_buffers}};
+    proxy_ignore_client_abort   {{ nginx_proxy_ignore_client_abort }};
+
+    # Caches information about open FDs, freqently accessed files.
+    open_file_cache             {{ nginx_open_file_cache }};
+    open_file_cache_valid       {{ nginx_open_file_cache_valid }};
+    open_file_cache_min_uses    {{ nginx_open_file_cache_min_uses }};
+    open_file_cache_errors      {{ nginx_open_file_cache_errors }};
+
+    include             /etc/nginx/mime.types;
+    default_type        application/octet-stream;
+
+    # Buffer log writes to speed up IO, or disable them altogether
+    access_log {{ nginx_access_log }};
+    error_log {{ nginx_error_log }};
+
+    include /etc/nginx/conf.d/*.conf;
+
+    server {
+        
+        listen 80 default_server;
+
+        server_name _;
+        return 301 https://$host$request_uri;
+
+    }
+
+    server {
+        
+        listen 443;
+
+        server_name _;
+        return 301 https://sbaerlo.ch/er;
+
+        ssl on;
+        ssl_certificate /etc/ssl/nginx/sbaerlo.ch/sbaerlo.ch.pem;
+        ssl_certificate_key /etc/ssl/nginx/sbaerlo.ch/sbaerlo.ch.key;
+
+    }
+
+    include /etc/nginx/sites-enabled/*;
+
+}

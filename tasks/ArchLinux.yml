@@ -1,0 +1,8 @@
+---
+# tasks file for sbaerlocher.nginx
+
+- name: install nginx
+  pacman: name=nginx state=present
+  notify:
+    - start nginx
+    - enabled nginx

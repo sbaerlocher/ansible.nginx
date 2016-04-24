@@ -1,0 +1,5 @@
+---
+# vars file for sbaerlocher.nginx
+
+nginx_service_name: nginx
+

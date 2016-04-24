@@ -1,0 +1,11 @@
+---
+# handlers file for sbaerlocher.nginx
+
+- name: restart nginx
+  service: name={{ nginx_service_name }} state=restarted
+
+- name: start nginx
+  service: name={{ nginx_service_name }} state=started
+
+- name: enabled nginx
+  service: name={{ nginx_service_name }} enabled=yes

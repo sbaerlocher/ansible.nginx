@@ -1,0 +1,76 @@
+# {{ ansible_managed }}
+
+    server {
+        listen 443 ssl http2;
+
+        server_tokens off;
+		
+        # server names for this server.
+        # any requests that come in that match any these names will use the proxy.
+        server_name {{ item.server_name }};
+
+
+        ssl {{ item.ssl.ssl }};
+        ssl_certificate {{ item.ssl.ssl_certificate }};
+        ssl_certificate_key {{ item.ssl.ssl_certificate_key }};
+
+        #Access Logs
+        access_log /var/log/nginx/{{ item.server_name }}.access.log;
+        
+        #Error Logs
+        error_log /var/log/nginx/{{ item.server_name }}.error.log;
+
+        location / {
+        
+	        root {{ item.root }};
+    
+        }
+
+        {% if item.interpreter.hhvm is defined %}
+
+			{% include "interpreter/hhvm.j2" %}
+
+        {% endif %}
+
+        {% if item.interpreter.php is defined %}
+
+			{% include "interpreter/php7.j2" %}
+
+        {% endif %}
+
+        {% if item.conf.wordpress is defined %}
+
+			{% include "conf/wordpress.j2" %}    
+        
+        {% endif %}
+
+        # Rewrite for versioned CSS+JS via filemtime
+    		location ~* ^.+\.(css|js)$ {
+			gzip on;
+			expires max;
+        	add_header Pragma public;
+        	add_header Cache-Control "max-age=31536000, public";
+    		}
+
+		# Aggressive caching for static files
+    	# If you alter static files often, please use 
+    	# add_header Cache-Control "max-age=31536000, public, must-revalidate, proxy-revalidate";
+    	location ~* \.(asf|asx|wax|wmv|wmx|avi|bmp|class|divx|doc|docx|eot|exe|gif|gz|gzip|ico|jpg|jpeg|jpe|mdb|mid|midi|mov|qt|mp3|m4a|mp4|m4v|mpeg|mpg|mpe|mpp|odb|odc|odf|odg|odp|ods|odt|ogg|ogv|otf|pdf|png|pot|pps|ppt|pptx|ra|ram|svg|svgz|swf|tar|t?gz|tif|tiff|ttf|wav|webm|wma|woff|wri|xla|xls|xlsx|xlt|xlw|xml|zip)$ {
+			gzip on;
+			expires max;
+        	add_header Pragma public;
+        	add_header Cache-Control "max-age=31536000, public";
+    	}
+
+        # location /robots.txt {
+        #     echo "User-agent: *";
+        #     echo "Disallow: /";
+        #     add_header  X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
+        # }
+
+        location = /favicon.ico {
+            log_not_found           off;
+        }
+
+        {% include "error.j2" %}
+    }

@@ -1,0 +1,8 @@
+---
+# tasks file for sbaerlocher.nginx
+
+- name: install nginx
+  apt: name=nginx state=present update_cache=yes
+  notify:
+    - start nginx
+    - enabled nginx

@@ -1,0 +1,45 @@
+### Prevent public access for Wordpress internals
+location ~* wp-admin/includes { deny all; }
+location ~* wp-includes/theme-compat/ { deny all; }
+location ~* wp-includes/js/tinymce/langs/.*\.php { deny all; }
+
+location ~* (/\.|wp-config\.php|(liesmich|readme).*) {
+    return 444;
+}
+
+# Disable direct access of any *.php files in /wp_includes folder
+	location ~ ^/wp-includes/.+\.php$ {
+    return 444;
+}
+
+# Disable direct access of any *.php in /wp_content folder
+	location ~ ^/wp-content/.+\.php$ {
+	return 444;
+}
+
+# Disable direct access of any *.php in /wp_content/uploads folder
+	location ~ ^/wp-content/uploads/.+\.php$ {
+	return 444;
+}
+
+location ~ ^/files/(.*)$ {
+	alias /srv/wp-content/uploads/$server_name/$1;
+	expires max;
+	add_header Pragma public;
+	add_header Cache-Control "max-age=31536000, public";
+}
+
+location ~ ^/cache/(.*)$ {
+    alias /srv/wp-content/cache/autoptimize/$http_host/$1;
+	expires max;
+	add_header Pragma public;
+	add_header Cache-Control "max-age=31536000, public";		
+}
+
+location ~ ^/assets/(.*)$ {
+    alias /srv/wp-content/$1;	
+	expires max;
+	add_header Pragma public;
+	add_header Cache-Control "max-age=31536000, public";	
+	add_header Access-Control-Allow-Origin "*";
+}

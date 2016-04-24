@@ -1,0 +1,70 @@
+---
+# defaults file for sbaerlocher.nginx
+
+nginx_default_user: "nginx"
+
+nginx_default_release: ""
+
+nginx_worker_processes: "1"
+nginx_worker_connections: "1024"
+
+nginx_error_log: "/var/log/nginx/error.log warn"
+nginx_access_log: "/var/log/nginx/access.log main buffer=16k"
+
+nginx_sendfile: "on"
+nginx_tcp_nopush: "on"
+nginx_tcp_nodelay: "on"
+nginx_server_tokens: "off"
+
+nginx_keepalive_timeout: "45 20"
+nginx_keepalive_requests: "1000"
+
+nginx_reset_timedout_connection: "on"
+
+nginx_client_header_timeout: "3m"
+nginx_client_body_timeout: "3m"
+nginx_send_timeout: "3m"
+
+nginx_client_max_body_size: "1280m"
+nginx_connection_pool_size: "256"
+nginx_client_body_buffer_size: "128k"
+nginx_client_header_buffer_size: "1k"
+nginx_large_client_header_buffers: "4 4k"
+nginx_proxy_ignore_client_abort: "on"
+
+nginx_open_file_cache: "max=10000 inactive=30s"
+nginx_open_file_cache_valid: "60s"
+nginx_open_file_cache_min_uses: "2"
+nginx_open_file_cache_errors: "on"
+
+nginx_proxy: []
+#  - name: plex.sbaerlo.ch
+#    state: present
+#    server_name: plex.sbaerlo.ch
+#    ssl:
+#     ssl: "on"
+#     ssl_certificate: "/etc/ssl/nginx/sbaerlo.ch/sbaerlo.ch.pem"
+#     ssl_certificate_key: "/etc/ssl/nginx/sbaerlo.ch/sbaerlo.ch.key"
+#    scheme: https
+#    host: localhost
+#    port: 32400
+
+nginx_sites: []
+#  - name: sbaerlo.ch
+#    state: present
+#    server_name: sbaerlo.ch
+#    root: "/srv"
+#    ssl:
+#     ssl: on
+#     ssl_certificate: "/etc/ssl/nginx/sbaerlo.ch/sbaerlo.ch.pem"
+#     ssl_certificate_key: "/etc/ssl/nginx/sbaerlo.ch/sbaerlo.ch.key"
+#    interpreter:
+#     hhvm: yes
+#     php: no
+#    conf:
+#     wordpress: yes
+#    rules: 
+#    location: []
+#       - name:
+#         location: 
+#         regel:

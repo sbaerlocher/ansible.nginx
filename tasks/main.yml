@@ -1,0 +1,84 @@
+---
+# tasks file for sbaerlocher.nginx
+
+- name: add OS specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "vars/{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
+    - "vars/{{ ansible_distribution }}.yml"
+    - "vars/{{ ansible_os_family }}.yml"
+    - "vars/defaults.yml"
+
+- name: add OS specific task
+  include: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+    - "defaults.yml"
+
+- name: configuring nginx
+  template:
+    src: nginx.j2
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart nginx
+
+- name: adding conf.d
+  copy:
+    src: conf.d
+    dest: /etc/nginx/conf.d/
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: creates directory sites-available
+  file: path=/etc/nginx/sites-available state=directory
+
+- name: creates directory sites-enabled
+  file: path=/etc/nginx/sites-enabled state=directory
+
+- name: delete directory sites-enabled
+  file: path=/etc/nginx/sites-enabled/* state=absent
+
+- name: removing default host
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /etc/nginx/sites-available/default
+
+- name: configuring sites
+  template:
+    src: site.j2
+    dest: "/etc/nginx/sites-available/{{ item.name }}"
+    owner: root
+    group: root
+    mode: "0644"
+  with_items: "{{ nginx_sites }}"
+  when: nginx_sites is defined
+  notify: restart nginx
+
+- name: configuring proxy
+  template:
+    src: proxy.j2
+    dest: "/etc/nginx/sites-available/{{ item.name }}"
+    owner: root
+    group: root
+    mode: "0644"
+  with_items: "{{ nginx_proxy }}"
+  when: nginx_proxy is defined
+  notify: restart nginx
+
+- name: enabling sites
+  file:
+    src: "/etc/nginx/sites-available/{{ item.name }}"
+    dest: "/etc/nginx/sites-enabled/{{ item.name }}"
+    state: link
+  when: item.state is not defined or item.state == 'present'
+  with_items: 
+    - "{{ nginx_sites }}"
+    - "{{ nginx_proxy }}"
+  notify: restart nginx
