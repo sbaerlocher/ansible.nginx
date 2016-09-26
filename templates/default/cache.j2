@@ -1,0 +1,27 @@
+    # Rewrite for versioned CSS+JS via filemtime
+    location ~* ^.+\.(css|js)$ {
+        gzip on;
+        expires max;
+        add_header Pragma public;
+        add_header Cache-Control "max-age=31536000, public";
+    }
+    
+    # Aggressive caching for static files
+    # If you alter static files often, please use 
+    # add_header Cache-Control "max-age=31536000, public, must-revalidate, proxy-revalidate";
+    #location ~* \.(asf|asx|wax|wmv|wmx|avi|bmp|class|divx|doc|docx|eot|exe|gif|gz|gzip|ico|jpg|jpeg|jpe|mdb|mid|midi|mov|qt|mp3|m4a|mp4|m4v|mpeg|mpg|mpe|mpp|odb|odc|odf|odg|odp|ods|odt|ogg|ogv|otf pdf|png|pot|pps|ppt|pptx|ra|ram|svg|svgz|swf|tar|t?gz|tif|tiff|ttf|wav|webm|wma|woff|wri|xla|xls|xlsx|xlt|xlw|xml|zip)$ {
+    #    gzip on;
+    #    expires max;
+    #    add_header Pragma public;
+    #    add_header Cache-Control "max-age=31536000, public";
+    #}
+    
+    # location /robots.txt {
+    #     echo "User-agent: *";
+    #     echo "Disallow: /";
+    #     add_header  X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
+    # }
+    
+    location = /favicon.ico {
+        log_not_found           off;
+    }

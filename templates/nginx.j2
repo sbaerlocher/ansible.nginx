@@ -8,7 +8,10 @@ worker_processes {{ nginx_worker_processes }};
 pid /run/nginx.pid;
 
 events {
-    worker_connections 1024;
+    worker_connections          32768;
+    use                         epoll;
+    multi_accept                on;
+  #  worker_connections 1024;
 }
 
 http {
@@ -67,6 +70,8 @@ http {
 
     include /etc/nginx/conf.d/*.conf;
 
+    index index.php;
+
     server {
         
         listen 80 default_server;
@@ -92,3 +97,4 @@ http {
     include /etc/nginx/sites-enabled/*;
 
 }
+

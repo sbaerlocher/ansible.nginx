@@ -35,9 +35,14 @@ None
 
 ## Changelog
 
+### 1.1
+
+* clean role
+* add more feature
+
 ### 1.0
 
-* Initial release
+* initial release
 
 ## Author
 

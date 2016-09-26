@@ -1,0 +1,11 @@
+        #default headers
+        #X-XSS-Protection
+        add_header x-xss-protection "1; mode=block" always;
+        #X-Frame-Options
+        add_header x-frame-options "SAMEORIGIN" always;
+        #X-Content-Type-Options
+        add_header X-Content-Type-Options "nosniff" always;
+        #Content-Security-Policy
+        #add_header Content-Security-Policy "default-src 'self'; img-src *;font-src *;";
+        #Strict-Transport-Security
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;

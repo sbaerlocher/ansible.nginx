@@ -1,76 +1,213 @@
 # {{ ansible_managed }}
 
     server {
+        
+        listen 443 ssl http2;
+
+        server_name www.{{ item.site }};
+
+        return 301 https://{{ item.site }};
+
+        {% if item.nginx.ssl == 1 %}
+
+        ssl on;
+        ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem;
+        ssl_certificate_key /etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key;
+
+        {% endif %}
+
+    }
+
+    server {
+
         listen 443 ssl http2;
 
         server_tokens off;
 		
         # server names for this server.
         # any requests that come in that match any these names will use the proxy.
-        server_name {{ item.server_name }};
+        server_name {{ item.site }};
 
+        root /home/{{ item.site }};
 
-        ssl {{ item.ssl.ssl }};
-        ssl_certificate {{ item.ssl.ssl_certificate }};
-        ssl_certificate_key {{ item.ssl.ssl_certificate_key }};
+        {% if item.nginx.ssl == 1 %}
+
+        ssl on;
+        ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem;
+        ssl_certificate_key /etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key;
+
+        {% endif %}
 
         #Access Logs
-        access_log /var/log/nginx/{{ item.server_name }}.access.log;
+        access_log /var/log/nginx/{{ item.site }}.access.log;
         
         #Error Logs
-        error_log /var/log/nginx/{{ item.server_name }}.error.log;
+        error_log /var/log/nginx/{{ item.site }}.error.log;
+
+        {% include "default/status.j2" %}        
+
+        {% include "default/header.j2" %}
 
         location / {
+
+            {% if item.nginx.wordpress == 1 %}
+
+                {% if item.nginx.memcached == 1 %}
+
+            location / {
+                error_page 404 405 = @nocache;
+                
+                if ($query_string = true){
+                    return 405;
+                }
+                if ($request_method = POST){
+                    return 405;
+                }
+                if ($request_uri ~ "/wp-"){
+                    return 405;
+                }
+                if ($http_cookie ~ (wp-postpass|wordpress_logged_in|comment_author)_ ){
+                    return 405;
+                }
+                
+                default_type text/html;
+                add_header X-Powered-By Cachify;
+                set $memcached_key $http_host$uri;
+                memcached_pass localhost:11211;
+            }
+                {% else %}
+                
+            try_files $cache_enabler_uri $uri $uri/ $custom_subdir/index.php?$args;
+
+                {% endif %}        
+            {% else %}
+
+            return 301 https://sbaerlo.ch/er;
+            add_header  X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
+
+            {% endif %}
+        }
+
+        {%  if item.nginx.php == 1  %}
+
+            {% include "app/php.j2" %}
+
+        {% endif %}
+
+        {% if item.nginx.hhvm == 1 %}
+
+            {% include "app/hhvm.j2" %}
+
+        {% endif %}
+
+        {%  if item.nginx.wordpress == 1  %}
+ 
+        {% include "app/wordpress.j2" %}
+
+        {% endif %}  
+
         
-	        root {{ item.root }};
+        {% include "default/error.j2" %}
     
-        }
-
-        {% if item.interpreter.hhvm is defined %}
-
-			{% include "interpreter/hhvm.j2" %}
-
-        {% endif %}
-
-        {% if item.interpreter.php is defined %}
-
-			{% include "interpreter/php7.j2" %}
-
-        {% endif %}
-
-        {% if item.conf.wordpress is defined %}
-
-			{% include "conf/wordpress.j2" %}    
-        
-        {% endif %}
-
-        # Rewrite for versioned CSS+JS via filemtime
-    		location ~* ^.+\.(css|js)$ {
-			gzip on;
-			expires max;
-        	add_header Pragma public;
-        	add_header Cache-Control "max-age=31536000, public";
-    		}
-
-		# Aggressive caching for static files
-    	# If you alter static files often, please use 
-    	# add_header Cache-Control "max-age=31536000, public, must-revalidate, proxy-revalidate";
-    	location ~* \.(asf|asx|wax|wmv|wmx|avi|bmp|class|divx|doc|docx|eot|exe|gif|gz|gzip|ico|jpg|jpeg|jpe|mdb|mid|midi|mov|qt|mp3|m4a|mp4|m4v|mpeg|mpg|mpe|mpp|odb|odc|odf|odg|odp|ods|odt|ogg|ogv|otf|pdf|png|pot|pps|ppt|pptx|ra|ram|svg|svgz|swf|tar|t?gz|tif|tiff|ttf|wav|webm|wma|woff|wri|xla|xls|xlsx|xlt|xlw|xml|zip)$ {
-			gzip on;
-			expires max;
-        	add_header Pragma public;
-        	add_header Cache-Control "max-age=31536000, public";
-    	}
-
-        # location /robots.txt {
-        #     echo "User-agent: *";
-        #     echo "Disallow: /";
-        #     add_header  X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
-        # }
-
-        location = /favicon.ico {
-            log_not_found           off;
-        }
-
-        {% include "error.j2" %}
+        {% include "default/cache.j2" %}
     }
+
+{% if item.alias is defined %}
+#####################################################################################
+#################################### Alias ##########################################
+#####################################################################################
+
+    {% for alias in item.alias %}
+
+        {% if item.alias is defined %}
+
+        server {
+        
+        listen 443 ssl http2;
+
+        server_name www.{{ alias }};
+
+        return 301 https://{{ alias }};
+
+        {% if item.nginx.ssl == 1 %}
+
+        ssl on;
+        ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ alias }}.pem;
+        ssl_certificate_key /etc/ssl/nginx/{{ item.site }}/{{ alias }}.key;
+
+        {% endif %}
+
+        {% endif %}
+
+    }
+
+    server {
+
+        listen 443 ssl http2;
+
+        server_tokens off;
+        
+        # server names for this server.
+        # any requests that come in that match any these names will use the proxy.
+        server_name {{ alias }};
+
+        root /home/{{ item.site }};
+
+        {% if item.nginx.ssl == 1 %}
+
+        ssl on;
+        ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ alias }}.pem;
+        ssl_certificate_key /etc/ssl/nginx/{{ item.site }}/{{ alias }}.key;
+
+        {% endif %}
+
+        #Access Logs
+        access_log /var/log/nginx/{{ alias }}.access.log;
+        
+        #Error Logs
+        error_log /var/log/nginx/{{ alias }}.error.log;
+
+        {% include "default/status.j2" %}   
+
+        {% include "default/header.j2" %}
+
+        location / {
+
+            {% if item.nginx.wordpress == 1 %}
+
+            try_files $cache_enabler_uri $uri $uri/ $custom_subdir/index.php?$args;
+
+            {% else %}
+
+            return 301 https://sbaerlo.ch/er;
+            add_header  X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
+
+            {% endif %}
+        }
+
+        {%  if item.nginx.php == 1  %}
+
+            {% include "app/php.j2" %}
+
+        {% endif %}
+
+        {% if item.nginx.hhvm == 1 %}
+
+            {% include "app/hhvm.j2" %}
+
+        {% endif %}
+
+        {%  if item.nginx.wordpress == 1  %}
+ 
+        {% include "app/wordpress.j2" %}
+
+        {% endif %}  
+    
+        {% include "default/error.j2" %}
+
+        {% include "default/cache.j2" %}
+
+    }
+    {% endfor %}
+
+{% endif %}

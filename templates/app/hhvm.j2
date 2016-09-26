@@ -1,0 +1,9 @@
+	location ~ \.(hh|php)$ {
+	    #root /srv;
+	    fastcgi_index  index.php;
+	    fastcgi_keep_conn on;
+	    fastcgi_param  SCRIPT_FILENAME $document_root$fastcgi_script_name;
+	    fastcgi_pass unix:/var/run/{{ item.site }}.sock;
+	    fastcgi_param  HTTPS on;
+	    include        fastcgi_params;
+	}

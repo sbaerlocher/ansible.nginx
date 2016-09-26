@@ -1,12 +1,20 @@
 ---
 # tasks file for sbaerlocher.nginx
 
- - name: add nginx repo
-   yum_repository:
-     name: nginx repo
-     description: nginx repo
-     baseurl: http://nginx.org/packages/centos/$releasever/$basearch/
-     gpgcheck: no
+#- name: add nginx repo
+#  yum_repository:
+#    name: nginx repo
+#    description: nginx repo
+#    baseurl: http://nginx.org/packages/centos/$releasever/$basearch/
+#    gpgcheck: no
+
+- name: add nginx repo
+  copy:
+    src: nginx.repo
+    dest: /etc/yum.repos.d/nginx.repo
+    owner: root
+    group: root
+    mode: "0644"
 
 - name: install nginx
   yum: name=nginx state=present
