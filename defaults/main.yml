@@ -3,6 +3,8 @@
 
 nginx_webroot: /home
 
+nginx_default_ssl: ""
+
 nginx_default_user: "nginx"
 
 nginx_default_release: ""

@@ -3,14 +3,14 @@
     #error_page 502 503 /maintenance/502;
     
     location /overload {
-        rewrite ^\/(.+)$ /overload/?pk_campaign=$server_name break;
+        rewrite ^\/(.+)$ /pages/overload/?pk_campaign=$server_name break;
         proxy_pass https://sbaerlo.ch;
         add_header Access-Control-Allow-Origin *;
         add_header  X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
     }
     
     location /maintenance {
-        rewrite ^\/(.+)$ /maintenance/?pk_campaign=$server_name break;
+        rewrite ^\/(.+)$ /pages/maintenance/?pk_campaign=$server_name break;
         proxy_pass https://sbaerlo.ch;
         add_header Access-Control-Allow-Origin *;
         add_header  X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
@@ -22,7 +22,7 @@
     #error_page 405 /error/405;
     
     location /error {
-        rewrite ^\/(.+)$ /error/?pk_campaign=$server_name break;
+        rewrite ^\/(.+)$ /pages/error/?pk_campaign=$server_name break;
         proxy_pass https://sbaerlo.ch;
         add_header Access-Control-Allow-Origin *;
         add_header  X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";

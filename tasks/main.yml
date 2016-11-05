@@ -11,13 +11,20 @@
         - "default.yml"
       paths: vars
 
-- name: add OS specific task
-  include: "{{ item }}"
-  with_first_found:
-    - "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
-    - "{{ ansible_distribution }}.yml"
-    - "{{ ansible_os_family }}.yml"
-    - "defaults.yml"
+- name: add official nginx repo
+  yum_repository:
+    name: nginx
+    description: official nginx repo
+    baseurl: http://nginx.org/packages/centos/$releasever/$basearch/
+    gpgcheck: no
+    enabled: yes
+  when: ansible_distribution == 'CentOS'
+
+- name: install nginx
+  package: name=nginx state=latest
+  notify:
+    - start nginx
+    - enabled nginx
 
 - name: configuring nginx
   template:
@@ -83,20 +90,23 @@
 - name: Creates directory
   file: path=/home/{{ item.site }} state=directory
   with_items: "{{ sites }}"
-  when: nginx_sites is defined
+  when: item.site is defined
 
-#- name: Creates directory
-#  file: path={{ nginx_webroot }}/{{ item.site }}/web state=directory
-#  with_items: "{{ sites }}"
-#  when: nginx_sites is defined
-#
-#- name: Creates directory
-#  file: path={{ nginx_webroot }}/{{ item.site }}/ssl state=directory
-#  with_items: "{{ sites }}"
-#  when: nginx_sites is defined
+- block:
+  - name: Creates SSL Home
+    file: path=/etc/ssl/nginx/{{ item.site }} state=directory mode=0644
+    with_items: "{{ sites }}"
+  - name: Creates default zert
+    file: src=/etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.pem dest=/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem state=link mode=0644
+    with_items: "{{ sites }}"
+  - name: Creates default key
+    file: src=/etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.key dest=/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key state=link mode=0644
+    with_items: "{{ sites }}"
+  when: item.nginx.ssl == 1
 
 - name: Generate DHE key-exchange
   command: sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 4096 creates=/etc/ssl/certs/dhparam.pem
   notify: 
     - restart nginx
     - enabled nginx
+

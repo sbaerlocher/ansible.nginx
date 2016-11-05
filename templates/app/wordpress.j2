@@ -79,6 +79,14 @@
 	    add_header Access-Control-Allow-Origin "*";
 	}    
 
+	location ~* ^.+\.(ttf)|(ttc)|(otf)|(eot)|(svg)|(woff)$ {
+        gzip on;
+	    expires max;
+	    add_header Pragma public;
+	    add_header Cache-Control "max-age=31536000, public";    
+	    add_header Access-Control-Allow-Origin "*";
+    }
+
 	{% if item.nginx.cdn == 1 %}
 
 	{% endif %}
