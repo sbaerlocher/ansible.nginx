@@ -10,6 +10,9 @@
         - "{{ ansible_os_family }}.yml"
         - "default.yml"
       paths: vars
+  tags:
+    - configuration
+    - packages
 
 - name: add official nginx repo
   yum_repository:
@@ -19,12 +22,16 @@
     gpgcheck: no
     enabled: yes
   when: ansible_distribution == 'CentOS'
+  tags:
+    - packages
 
 - name: install nginx
   package: name=nginx state=latest
   notify:
     - start nginx
     - enabled nginx
+  tags:
+    - packages
 
 - name: configuring nginx
   template:
@@ -36,6 +43,8 @@
   notify: 
     - restart nginx
     - enabled nginx
+  tags:
+    - configuration
 
 - name: adding conf.d
   copy:
@@ -44,15 +53,23 @@
     owner: root
     group: root
     mode: "0644"
+  tags:
+    - configuration
 
 - name: creates directory sites-available
   file: path=/etc/nginx/sites-available state=directory
+  tags:
+    - configuration
 
 - name: creates directory sites-enabled
   file: path=/etc/nginx/sites-enabled state=directory
+  tags:
+    - configuration
 
 - name: delete directory sites-enabled
   file: path=/etc/nginx/sites-enabled/* state=absent
+  tags:
+    - configuration
 
 - name: removing default host
   file:
@@ -60,6 +77,8 @@
     state: absent
   with_items:
     - /etc/nginx/sites-available/default
+  tags:
+    - configuration
 
 - name: configuring sites
   template:
@@ -71,14 +90,16 @@
   with_items: 
     - "{{ sites }}"
   when: item.site is defined
-  notify: 
-    - restart nginx
-    - enabled nginx
+  tags:
+    - configuration
 
 - name: enabling sites
   file:
     src: "/etc/nginx/sites-available/{{ item.site }}"
     dest: "/etc/nginx/sites-enabled/{{ item.site }}"
+    owner: root
+    group: root
+    mode: "0644"
     state: link
   when: item.enabled == 1
   with_items: 
@@ -86,11 +107,15 @@
   notify: 
     - restart nginx
     - enabled nginx
+  tags:
+    - configuration
 
 - name: Creates directory
   file: path=/home/{{ item.site }} state=directory
   with_items: "{{ sites }}"
   when: item.site is defined
+  tags:
+    - configuration
 
 - block:
   - name: Creates SSL Home
@@ -102,11 +127,14 @@
   - name: Creates default key
     file: src=/etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.key dest=/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key state=link mode=0644
     with_items: "{{ sites }}"
-  when: item.nginx.ssl == 1
+  when: item.nginx.ssl == 1 and nginx_default_ssl != item.site 
+  tags:
+    - configuration
 
 - name: Generate DHE key-exchange
   command: sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 4096 creates=/etc/ssl/certs/dhparam.pem
   notify: 
     - restart nginx
     - enabled nginx
-
+  tags:
+    - configuration
