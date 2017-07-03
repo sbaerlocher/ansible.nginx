@@ -6,7 +6,7 @@
 
         server_name www.{{ item.site }};
 
-        return 301 https://{{ item.site }};
+
 
         {% if item.nginx.ssl == 1 %}
 
@@ -15,6 +15,18 @@
         ssl_certificate_key /etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key;
 
         {% endif %}
+
+        {% if item.nginx.certbot = 1 %}
+
+            {% include "app/certbot.j2" %}
+        
+        {% endif %}
+
+        location / {
+  
+            return 301 https://{{ item.site }};
+
+        }
 
     }
 
@@ -96,6 +108,13 @@
             {% endif %}
         }
 
+
+        {% if item.nginx.certbot = 1 %}
+
+            {% include "app/certbot.j2" %}
+        
+        {% endif %}
+
         {%  if item.nginx.php == 1  %}
 
             {% include "app/php.j2" %}
@@ -145,6 +164,14 @@
 
         {% endif %}
 
+
+        {% if item.nginx.certbot = 1 %}
+
+            {% include "app/certbot.j2" %}
+        
+        {% endif %}
+
+
         {% endif %}
 
     }
@@ -192,6 +219,12 @@
 
             {% endif %}
         }
+
+        {% if item.nginx.certbot = 1 %}
+
+            {% include "app/certbot.j2" %}
+        
+        {% endif %}
 
         {%  if item.nginx.php == 1  %}
 
