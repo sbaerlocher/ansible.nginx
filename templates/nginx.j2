@@ -86,7 +86,11 @@ http {
         listen 443 default_server;
 
         server_name _;
-        return 301 https://$host$request_uri;
+        return 301 {{ nginx_default_url }};
+
+        ssl on;
+        ssl_certificate /etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.pem;
+        ssl_certificate_key /etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.key;
 
     }
 
