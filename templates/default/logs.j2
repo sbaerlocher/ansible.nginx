@@ -1,0 +1,12 @@
+    location /robots.txt {
+    #     echo "User-agent: *";
+    #     echo "Disallow: /";
+    #    add_header  X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
+        access_log off;
+        log_not_found off;
+    }
+    
+    location = /favicon.ico { 
+        access_log off;
+        log_not_found off;
+    }

@@ -6,8 +6,6 @@
 
         server_name www.{{ item.site }};
 
-
-
         {% if item.nginx.ssl == 1 %}
 
         ssl on;
@@ -65,9 +63,6 @@
 
         {% include "default/header.j2" %}
 
-        location = /favicon.ico { access_log off; log_not_found off; }
-        location = /robots.txt  { access_log off; log_not_found off; }
-
         location / {
 
             {% if item.nginx.wordpress == 1 %}
@@ -108,7 +103,6 @@
             {% endif %}
         }
 
-
         {% if item.nginx.certbot = 1 %}
 
             {% include "app/certbot.j2" %}
@@ -132,11 +126,12 @@
         {% include "app/wordpress.j2" %}
 
         {% endif %}  
-
         
         {% include "default/error.j2" %}
     
         {% include "default/cache.j2" %}
+
+        {% include "default/logs.j2" %}
     }
 
 {% if item.alias is defined %}
@@ -156,21 +151,19 @@
 
         return 301 https://{{ alias }};
 
-        {% if item.nginx.ssl == 1 %}
+            {% if item.nginx.ssl == 1 %}
 
         ssl on;
         ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ alias }}.pem;
         ssl_certificate_key /etc/ssl/nginx/{{ item.site }}/{{ alias }}.key;
 
-        {% endif %}
+            {% endif %}
 
+            {% if item.nginx.certbot = 1 %}
 
-        {% if item.nginx.certbot = 1 %}
-
-            {% include "app/certbot.j2" %}
+                {% include "app/certbot.j2" %}
         
-        {% endif %}
-
+            {% endif %}
 
         {% endif %}
 
@@ -247,6 +240,8 @@
         {% include "default/error.j2" %}
 
         {% include "default/cache.j2" %}
+
+        {% include "default/logs.j2" %}
 
     }
     {% endfor %}
