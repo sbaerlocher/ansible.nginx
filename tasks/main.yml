@@ -66,11 +66,6 @@
   tags:
     - configuration
 
-- name: delete directory sites-enabled
-  file: path=/etc/nginx/sites-enabled/* state=absent
-  tags:
-    - configuration
-
 - name: removing default host
   file:
     path: "{{ item }}"
@@ -90,6 +85,19 @@
   with_items: 
     - "{{ sites }}"
   when: item.site is defined
+  tags:
+    - configuration
+
+- name: disable sites
+  file:
+    path: "/etc/nginx/sites-enabled/{{ item.site }}"
+    state: absent
+  when: item.enabled == 0
+  with_items: 
+    - "{{ sites }}"
+  notify: 
+    - restart nginx
+    - enabled nginx
   tags:
     - configuration
 
