@@ -35,6 +35,10 @@ None
 
 ## Changelog
 
+### 1.2
+
+* add feature site disable
+
 ### 1.1
 
 * clean role
