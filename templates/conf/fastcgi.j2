@@ -1,0 +1,19 @@
+# PHP 
+fastcgi_intercept_errors        on; 
+fastcgi_ignore_client_abort     on; 
+fastcgi_buffers                 256 16k; 
+fastcgi_buffer_size             128k; 
+fastcgi_busy_buffers_size       256k; 
+fastcgi_temp_file_write_size    256k; 
+fastcgi_read_timeout            360; 
+fastcgi_send_timeout            360; 
+-
+fastcgi_connect_timeout         1200; 
+fastcgi_index                   index.php; 
+fastcgi_hide_header             X-Powered-By; 
+fastcgi_cache_min_uses          1; 
+fastcgi_cache_valid             200 302 30m; 
+fastcgi_cache_valid             404 5m; 
+fastcgi_cache_use_stale         error timeout invalid_header updating http_500 http_503; 
+fastcgi_cache_key               "$scheme$request_method$host$request_uri"; 
+fastcgi_ignore_headers          "X-Accel-Redirect" "X-Accel-Expires" "Expires" "Cache-Control" "Set-Cookie";
