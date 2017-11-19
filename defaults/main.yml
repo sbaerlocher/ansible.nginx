@@ -48,7 +48,7 @@ nginx_ssl_protocols:
   - TLSv1
   - TLSv1.1
   - TLSv1.2
-  
+
 # nginx ssl ciphersuite
 nginx_ssl_ciphers:
   - ECDHE-RSA-AES128-GCM-SHA256
@@ -92,7 +92,7 @@ nginx_ssl_ciphers:
   - "!EDH-DSS-DES-CBC3-SHA"
   - "!EDH-RSA-DES-CBC3-SHA"
   - "!KRB5-DES-CBC3-SHA"
-        
+
 nginx_proxy: []
 #  - name: plex.sbaerlo.ch
 #    state: present
