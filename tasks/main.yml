@@ -60,6 +60,9 @@
     - gzip_static
     - gzip
     - fastcgi
+  notify:
+    - restart nginx
+    - enabled nginx
   tags:
     - configuration
 
@@ -163,7 +166,8 @@
     - configuration
 
 - name: Generate DHE key-exchange
-  command: sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 4096 creates=/etc/ssl/certs/dhparam.pem
+  become: yes
+  command: openssl dhparam -dsaparam -out /etc/ssl/certs/dhparam.pem 4096 creates=/etc/ssl/certs/dhparam.pem
   notify:
     - restart nginx
     - enabled nginx

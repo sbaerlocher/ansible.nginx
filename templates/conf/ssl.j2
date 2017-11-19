@@ -1,4 +1,3 @@
-@@ -1,43 +0,0 @@
 # Protect against the BEAST and POODLE attacks by not using SSLv3 at all. If you need to support older browsers (IE6) you may need to add 
 # SSLv3 to the list of protocols below. 
 ssl_protocols               {{ nginx_ssl_protocols | join(' ') }}; 
@@ -19,7 +18,7 @@ ssl_session_timeout  24h;
  
 # Session tickets appeared in version 1.5.9 
 # 
--
+
 # nginx does not auto-rotate session ticket keys: only a HUP / restart will do so and 
 # when a restart is performed the previous key is lost, which resets all previous 
 # sessions. The fix for this is to setup a manual rotation mechanism: 

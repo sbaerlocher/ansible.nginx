@@ -1,0 +1,6 @@
+---
+# vars file for sbaerlocher.nginx
+
+nginx_service_name: nginx
+
+nginx_user: www-data
