@@ -109,6 +109,12 @@
         {% include "app/wordpress.j2" %}
 
         {% endif %}  
+    
+        {%  if item.nginx.laravel == 1  %}
+ 
+        {% include "app/laravel.j2" %}
+
+        {% endif %}  
         
         {% include "default/error.j2" %}
     
