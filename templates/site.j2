@@ -34,8 +34,16 @@
         # any requests that come in that match any these names will use the proxy.
         server_name {{ item.site }};
 
-        root /home/{{ item.site }};
+        {% if item.nginx.laravel == 1 %}   
 
+        root /home/{{ item.site }}/public;
+
+        {% else %}
+        
+        root /home/{{ item.site }};
+       
+        {% endif %}
+        
         {% if item.nginx.ssl == 1 %}
 
         ssl on;
