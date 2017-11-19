@@ -89,7 +89,12 @@
                 
             try_files $cache_enabler_uri $uri $uri/ $custom_subdir/index.php?$args;
 
-                {% endif %}        
+                {% endif %}
+
+            {% elif item.nginx.laravel == 1 %}   
+
+            try_files $uri $uri/ =404;
+
             {% else %}
 
             return 301 https://sbaerlo.ch/er;
