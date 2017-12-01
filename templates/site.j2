@@ -29,13 +29,23 @@
         server_tokens off;
 
         charset utf-8;
+
+        index index.php index.html index.htm;
 		
         # server names for this server.
         # any requests that come in that match any these names will use the proxy.
         server_name {{ item.site }};
 
-        root /home/{{ item.site }};
+        {% if item.nginx.laravel == 1 %}   
 
+        root /home/{{ item.site }}/public;
+
+        {% else %}
+        
+        root /home/{{ item.site }};
+       
+        {% endif %}
+        
         {% if item.nginx.ssl == 1 %}
 
         ssl on;
@@ -52,7 +62,7 @@
         access_log /var/log/nginx/{{ item.site }}.access.log;
         
         #Error Logs
-        error_log /var/log/nginx/{{ item.site }}.error.log;
+        error_log /var/log/nginx/{{ item.site }}.error.log warn;
 
         {% include "default/status.j2" %}        
 
@@ -89,7 +99,12 @@
                 
             try_files $cache_enabler_uri $uri $uri/ $custom_subdir/index.php?$args;
 
-                {% endif %}        
+                {% endif %}
+
+            {% elif item.nginx.laravel == 1 %}   
+
+            try_files $uri $uri/ /index.php?$query_string;
+
             {% else %}
 
             return 301 https://sbaerlo.ch/er;
@@ -107,6 +122,12 @@
         {%  if item.nginx.wordpress == 1  %}
  
         {% include "app/wordpress.j2" %}
+
+        {% endif %}  
+    
+        {%  if item.nginx.laravel == 1  %}
+ 
+        {% include "app/laravel.j2" %}
 
         {% endif %}  
         

@@ -4,3 +4,5 @@
 nginx_service_name: nginx
 
 nginx_user: www-data
+
+nginx_pool_listen: /run/php
