@@ -37,6 +37,10 @@ None
 
 ## Changelog
 
+### 1.3
+
+* add laravel support for site
+
 ### 1.2
 
 * add feature site disable
