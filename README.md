@@ -1,13 +1,15 @@
 # Ansible Role: Nginx
 
+[![Build Status](https://travis-ci.org/sbaerlocher/ansible.nginx.svg?branch=master)](https://travis-ci.org/sbaerlocher/ansible.nginx) [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://sbaerlo.ch/licence) [![Ansible Galaxy](http://img.shields.io/badge/ansible--galaxy-nginx-blue.svg)](https://galaxy.ansible.com/sbaerlocher/nginx)
+
 ## Description
 
 Ansible role for installing and Configuration Nginx on RHEL/CentOS, Debian/Ubuntu or ArchLinux.
 
 ## Installation
 
-```
-$ ansible-galaxy install sbaerlocher.nginx
+```bash
+ansible-galaxy install sbaerlocher.nginx
 ```
 
 ## Requirements
@@ -35,6 +37,10 @@ None
 
 ## Changelog
 
+### 1.3
+
+* add laravel support for site
+
 ### 1.2
 
 * add feature site disable
@@ -51,7 +57,7 @@ None
 ## Author
 
 * [Simon Bärlocher](https://sbaerlocher.ch)
- 
+
 ## License
 
 This project is under the MIT License. See the [LICENSE](https://sbaerlo.ch/licence) file for the full license text.

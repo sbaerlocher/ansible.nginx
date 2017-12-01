@@ -26,7 +26,8 @@
     - packages
 
 - name: install nginx
-  package: name=nginx state=latest
+  package:
+    name: nginx
   notify:
     - start nginx
     - enabled nginx
@@ -40,29 +41,42 @@
     owner: root
     group: root
     mode: "0644"
-  notify: 
+  notify:
     - restart nginx
     - enabled nginx
   tags:
     - configuration
 
 - name: adding conf.d
-  copy:
-    src: conf.d
-    dest: /etc/nginx
+  template:
+    src: "conf/{{ item }}.j2"
+    dest: "/etc/nginx/conf.d/{{ item }}.conf"
     owner: root
     group: root
     mode: "0644"
+  with_items:
+    - ssl
+    - ssl-stapling
+    - gzip_static
+    - gzip
+    - fastcgi
+  notify:
+    - restart nginx
+    - enabled nginx
   tags:
     - configuration
 
 - name: creates directory sites-available
-  file: path=/etc/nginx/sites-available state=directory
+  file:
+    path: /etc/nginx/sites-available
+    state: directory
   tags:
     - configuration
 
 - name: creates directory sites-enabled
-  file: path=/etc/nginx/sites-enabled state=directory
+  file:
+    path: /etc/nginx/sites-enabled
+    state: directory
   tags:
     - configuration
 
@@ -82,8 +96,11 @@
     owner: root
     group: root
     mode: "0644"
-  with_items: 
+  with_items:
     - "{{ sites }}"
+  notify:
+    - restart nginx
+    - enabled nginx
   when: item.site is defined
   tags:
     - configuration
@@ -93,9 +110,9 @@
     path: "/etc/nginx/sites-enabled/{{ item.site }}"
     state: absent
   when: item.enabled == 0
-  with_items: 
+  with_items:
     - "{{ sites }}"
-  notify: 
+  notify:
     - restart nginx
     - enabled nginx
   tags:
@@ -110,48 +127,51 @@
     mode: "0644"
     state: link
   when: item.enabled == 1
-  with_items: 
+  with_items:
     - "{{ sites }}"
-  notify: 
+  notify:
     - restart nginx
     - enabled nginx
   tags:
     - configuration
 
 - name: Creates directory
-  file: path=/home/{{ item.site }} state=directory
+  file:
+    path: "/home/{{ item.site }}"
+    state: directory
   with_items: "{{ sites }}"
   when: item.site is defined
   tags:
     - configuration
 
 - block:
-  - name: Creates SSL Home
-    file: path=/etc/ssl/nginx/{{ item.site }} state=directory mode=0644
-    with_items: "{{ sites }}"
-  - name: Creates Certbot zert
-    file: src=/etc/letsencrypt/live/{{ item.site }}/fullchain.pem dest=/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem state=link mode=0644
-    with_items: "{{ sites }}"
-    when: item.nginx.certbot == 1
-  - name: Creates Certbot key
-    file: src=/etc/letsencrypt/live/{{ item.site }}/privkey.pem dest=/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key state=link mode=0644
-    with_items: "{{ sites }}"
-    when: item.nginx.certbot == 1
-  - name: Creates default zert
-    file: src=/etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.pem dest=/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem state=link mode=0644
-    with_items: "{{ sites }}"
-    when: item.nginx.certbot == 0
-  - name: Creates default key
-    file: src=/etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.key dest=/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key state=link mode=0644
-    with_items: "{{ sites }}"
-    when: item.nginx.certbot == 0
+    - name: Creates SSL Home
+      file: path=/etc/ssl/nginx/{{ item.site }} state=directory mode=0644
+      with_items: "{{ sites }}"
+    - name: Creates Certbot zert
+      file: src=/etc/letsencrypt/live/{{ item.site }}/fullchain.pem dest=/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem state=link mode=0644
+      with_items: "{{ sites }}"
+      when: item.nginx.certbot == 1
+    - name: Creates Certbot key
+      file: src=/etc/letsencrypt/live/{{ item.site }}/privkey.pem dest=/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key state=link mode=0644
+      with_items: "{{ sites }}"
+      when: item.nginx.certbot == 1
+    - name: Creates default zert
+      file: src=/etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.pem dest=/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem state=link mode=0644
+      with_items: "{{ sites }}"
+      when: item.nginx.certbot == 0
+    - name: Creates default key
+      file: src=/etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.key dest=/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key state=link mode=0644
+      with_items: "{{ sites }}"
+      when: item.nginx.certbot == 0
   when: item.nginx.ssl == 1 and nginx_default_ssl != item.site
   tags:
     - configuration
 
 - name: Generate DHE key-exchange
-  command: sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 4096 creates=/etc/ssl/certs/dhparam.pem
-  notify: 
+  become: yes
+  command: openssl dhparam -dsaparam -out /etc/ssl/certs/dhparam.pem 4096 creates=/etc/ssl/certs/dhparam.pem
+  notify:
     - restart nginx
     - enabled nginx
   tags:

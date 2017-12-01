@@ -3,7 +3,7 @@
 #   * Official English Documentation: http://nginx.org/en/docs/
 #   * Official Russian Documentation: http://nginx.org/ru/docs/
 
-user {{ nginx_default_user }};
+user {{ nginx_user }};
 worker_processes {{ nginx_worker_processes }};
 pid /run/nginx.pid;
 
@@ -70,7 +70,7 @@ http {
 
     include /etc/nginx/conf.d/*.conf;
 
-    index index.php;
+    index index.php index.html index.htm;
 
     server {
         
