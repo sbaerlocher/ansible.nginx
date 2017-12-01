@@ -29,6 +29,8 @@
         server_tokens off;
 
         charset utf-8;
+
+        index index.php index.html index.htm;
 		
         # server names for this server.
         # any requests that come in that match any these names will use the proxy.
@@ -60,7 +62,7 @@
         access_log /var/log/nginx/{{ item.site }}.access.log;
         
         #Error Logs
-        error_log /var/log/nginx/{{ item.site }}.error.log;
+        error_log /var/log/nginx/{{ item.site }}.error.log warn;
 
         {% include "default/status.j2" %}        
 
@@ -101,7 +103,7 @@
 
             {% elif item.nginx.laravel == 1 %}   
 
-            try_files $uri $uri/ =404;
+            try_files $uri $uri/ /index.php?$query_string;
 
             {% else %}
 
