@@ -150,7 +150,7 @@
     - name: Creates default key
       file: src=/etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.key dest=/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key state=link mode=0644
       with_items: "{{ sites }}"
-      when: not item.nginx.certbot 
+      when: not item.nginx.certbot
   when: item.nginx.ssl and nginx_default_ssl != item.site
   tags:
     - configuration
