@@ -41,10 +41,6 @@
         ssl on;
         ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem;
         ssl_certificate_key /etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key;
-        ssl_protocols {{ nginx_ssl_protocols | join(' ') }};
-        ssl_ciphers {{ nginx_ssl_ciphers | join(':') }};
-        ssl_prefer_server_ciphers on;
-        ssl_dhparam /etc/ssl/certs/dhparam.pem;
 
         {% endif %}  
 
@@ -119,10 +115,6 @@
         ssl on;
         ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem;
         ssl_certificate_key /etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key;
-        ssl_protocols {{ nginx_ssl_protocols | join(' ') }};
-        ssl_ciphers {{ nginx_ssl_ciphers | join(':') }};
-        ssl_prefer_server_ciphers on;
-        ssl_dhparam /etc/ssl/certs/dhparam.pem;
 
         {% endif %}  
 
