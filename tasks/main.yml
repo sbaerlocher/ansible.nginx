@@ -31,6 +31,7 @@
   notify:
     - start nginx
     - enabled nginx
+    - removing default nginx host
   tags:
     - packages
 
@@ -43,7 +44,6 @@
     mode: "0644"
   notify:
     - restart nginx
-    - enabled nginx
   tags:
     - configuration
 
@@ -62,7 +62,6 @@
     - fastcgi
   notify:
     - restart nginx
-    - enabled nginx
   tags:
     - configuration
 
@@ -80,15 +79,6 @@
   tags:
     - configuration
 
-- name: removing default host
-  file:
-    path: "{{ item }}"
-    state: absent
-  with_items:
-    - /etc/nginx/sites-available/default
-  tags:
-    - configuration
-
 - name: configuring sites
   template:
     src: site.j2
@@ -100,7 +90,6 @@
     - "{{ sites }}"
   notify:
     - restart nginx
-    - enabled nginx
   when: item.site is defined
   tags:
     - configuration
@@ -114,7 +103,6 @@
     - "{{ sites }}"
   notify:
     - restart nginx
-    - enabled nginx
   tags:
     - configuration
 
@@ -131,7 +119,6 @@
     - "{{ sites }}"
   notify:
     - restart nginx
-    - enabled nginx
   tags:
     - configuration
 
@@ -173,6 +160,5 @@
   command: openssl dhparam -dsaparam -out /etc/ssl/certs/dhparam.pem 4096 creates=/etc/ssl/certs/dhparam.pem
   notify:
     - restart nginx
-    - enabled nginx
   tags:
     - configuration

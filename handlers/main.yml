@@ -2,10 +2,21 @@
 # handlers file for sbaerlocher.nginx
 
 - name: restart nginx
-  service: name={{ nginx_service_name }} state=restarted
+  service:
+    name: "{{ nginx_service_name }}"
+    state: restarted
 
 - name: start nginx
-  service: name={{ nginx_service_name }} state=started
+  service:
+    name: "{{ nginx_service_name }}"
+    state: started
 
 - name: enabled nginx
-  service: name={{ nginx_service_name }} enabled=yes
+  service:
+    name: "{{ nginx_service_name }}"
+    enabled: yes
+
+- name: removing default nginx host
+  file:
+    path: "/etc/nginx/sites-available/default"
+    state: absent
