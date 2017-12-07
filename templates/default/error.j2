@@ -1,29 +1,15 @@
-    # Error pages must have properly set http headers!
-    ##error_page 500 501 504 /overload/500;
-    #error_page 502 503 /maintenance/502;
-    
-    location /overload {
-        rewrite ^\/(.+)$ /pages/overload/?pk_campaign=$server_name break;
-        proxy_pass https://sbaerlo.ch;
-        add_header Access-Control-Allow-Origin *;
-        add_header  X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
-    }
-    
-    location /maintenance {
-        rewrite ^\/(.+)$ /pages/maintenance/?pk_campaign=$server_name break;
-        proxy_pass https://sbaerlo.ch;
-        add_header Access-Control-Allow-Origin *;
-        add_header  X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
-    }
-    
-    # custom error pages
-    #error_page 403 /error/403;
-    #error_page 404 /error/404;
-    #error_page 405 /error/405;
-    
-    location /error {
-        rewrite ^\/(.+)$ /pages/error/?pk_campaign=$server_name break;
-        proxy_pass https://sbaerlo.ch;
-        add_header Access-Control-Allow-Origin *;
-        add_header  X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
+
+    {% if nginx_default_error_page %}
+    error_page 403 /error/403;
+    error_page 404 /error/404;
+    error_page 405 /error/405;
+    {% endif %}
+    error_page 500 /overload/500;
+    error_page 501 /overload/501;
+    error_page 502 /maintenance/200;
+    error_page 503 /maintenance/503;
+    error_page 504 /overload/504;
+ 
+    location ~/(error|overload|maintenance)/(40[345]|50[01234]) {
+        return 302 https://sbaerlo.ch/er/$1/?ref=$server_name&pk_campaign=$1&pk_kwd=$server_name&page=$2;
     }
