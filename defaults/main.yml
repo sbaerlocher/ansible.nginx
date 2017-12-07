@@ -3,6 +3,8 @@
 
 nginx_webroot: /home
 
+nginx_default_error_page: false
+
 nginx_default_url: []
 
 nginx_default_ssl: []

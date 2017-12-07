@@ -63,9 +63,7 @@
         {% else %}
         
         location / {
-
-            return 301 https://sbaerlo.ch/er; 
-            add_header  X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
+            return 301 https://sbaerlo.ch/er/?ref=$server_name&pk_campaign=redirection&pk_kwd=$server_name;
         }
 
         {% endif %}  
@@ -143,9 +141,7 @@
         {% else %}
         
         location / {
-
-            return 301 https://sbaerlo.ch/er; 
-            add_header  X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
+            return 301 https://sbaerlo.ch/er/?ref=$server_name&pk_campaign=redirection&pk_kwd=$server_name;
         }
 
         {% endif %}  
