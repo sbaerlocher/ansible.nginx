@@ -109,7 +109,7 @@
   file:
     path: "/etc/nginx/sites-enabled/{{ item.site }}"
     state: absent
-  when: item.enabled == 0
+  when: not item.enabled
   with_items:
     - "{{ sites }}"
   notify:
@@ -126,7 +126,7 @@
     group: root
     mode: "0644"
     state: link
-  when: item.enabled == 1
+  when: item.enabled
   with_items:
     - "{{ sites }}"
   notify:
@@ -151,20 +151,20 @@
     - name: Creates Certbot zert
       file: src=/etc/letsencrypt/live/{{ item.site }}/fullchain.pem dest=/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem state=link mode=0644
       with_items: "{{ sites }}"
-      when: item.nginx.certbot == 1
+      when: item.nginx.certbot
     - name: Creates Certbot key
       file: src=/etc/letsencrypt/live/{{ item.site }}/privkey.pem dest=/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key state=link mode=0644
       with_items: "{{ sites }}"
-      when: item.nginx.certbot == 1
+      when: item.nginx.certbot
     - name: Creates default zert
       file: src=/etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.pem dest=/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem state=link mode=0644
       with_items: "{{ sites }}"
-      when: item.nginx.certbot == 0
+      when: not item.nginx.certbot
     - name: Creates default key
       file: src=/etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.key dest=/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key state=link mode=0644
       with_items: "{{ sites }}"
-      when: item.nginx.certbot == 0
-  when: item.nginx.ssl == 1 and nginx_default_ssl != item.site
+      when: not item.nginx.certbot 
+  when: item.nginx.ssl and nginx_default_ssl != item.site
   tags:
     - configuration
 

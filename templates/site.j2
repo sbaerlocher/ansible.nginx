@@ -6,7 +6,7 @@
 
         server_name www.{{ item.site }};
 
-        {% if item.nginx.ssl == 1 %}
+        {% if item.nginx.ssl %}
 
         ssl on;
         ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem;
@@ -36,7 +36,7 @@
         # any requests that come in that match any these names will use the proxy.
         server_name {{ item.site }};
 
-        {% if item.nginx.ssl == 1 %}
+        {% if item.nginx.ssl %}
 
         ssl on;
         ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem;
@@ -88,7 +88,7 @@
 
         return 301 https://{{ alias }};
 
-            {% if item.nginx.ssl == 1 %}
+            {% if item.nginx.ssl %}
 
         ssl on;
         ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ alias }}.pem;
@@ -110,7 +110,7 @@
         # any requests that come in that match any these names will use the proxy.
         server_name {{ alias }};
 
-        {% if item.nginx.ssl == 1 %}
+        {% if item.nginx.ssl %}
 
         ssl on;
         ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem;
