@@ -116,37 +116,42 @@
         # any requests that come in that match any these names will use the proxy.
         server_name {{ alias }};
 
-        {% if item.nginx.laravel == 1 %}   
-
-        root /home/{{ item.site }}/public;
-
-        {% else %}
-        
-        root /home/{{ item.site }};
-       
-        {% endif %}
-
         {% if item.nginx.ssl == 1 %}
 
         ssl on;
-        ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ alias }}.pem;
-        ssl_certificate_key /etc/ssl/nginx/{{ item.site }}/{{ alias }}.key;
+        ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem;
+        ssl_certificate_key /etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key;
+        ssl_protocols {{ nginx_ssl_protocols | join(' ') }};
+        ssl_ciphers {{ nginx_ssl_ciphers | join(':') }};
+        ssl_prefer_server_ciphers on;
+        ssl_dhparam /etc/ssl/certs/dhparam.pem;
 
-        {% endif %}
+        {% endif %}  
 
-        {% include "default/status.j2" %}   
+        {% include "default/status.j2" %}        
 
         {% include "default/header.j2" %}
 
-
-        {%  if item.nginx.wordpress == 1  %}
+        {%  if item.stack == 'wordpress'  %}
  
         {% include "app/wordpress.j2" %}
+    
+        {%  elif item.stack == 'laravel'  %}
+ 
+        {% include "app/laravel.j2" %}
+
+        {% else %}
+        
+        location / {
+
+            return 301 https://sbaerlo.ch/er; 
+            add_header  X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
+        }
 
         {% endif %}  
-    
+        
         {% include "default/error.j2" %}
-
+    
         {% include "default/cache.j2" %}
 
         {% include "default/logs.j2" %}
