@@ -36,16 +36,6 @@
         # any requests that come in that match any these names will use the proxy.
         server_name {{ item.site }};
 
-        {% if item.nginx.laravel == 1 %}   
-
-        root /home/{{ item.site }}/public;
-
-        {% else %}
-        
-        root /home/{{ item.site }};
-       
-        {% endif %}
-        
         {% if item.nginx.ssl == 1 %}
 
         ssl on;
@@ -56,78 +46,27 @@
         ssl_prefer_server_ciphers on;
         ssl_dhparam /etc/ssl/certs/dhparam.pem;
 
-        {% endif %}
-
-        #Access Logs
-        access_log /var/log/nginx/{{ item.site }}.access.log;
-        
-        #Error Logs
-        error_log /var/log/nginx/{{ item.site }}.error.log warn;
+        {% endif %}  
 
         {% include "default/status.j2" %}        
 
         {% include "default/header.j2" %}
 
-        location / {
-
-            {% if item.nginx.wordpress == 1 %}
-
-                {% if item.nginx.memcached == 1 %}
-
-            location / {
-                error_page 404 405 = @nocache;
-                
-                if ($query_string = true){
-                    return 405;
-                }
-                if ($request_method = POST){
-                    return 405;
-                }
-                if ($request_uri ~ "/wp-"){
-                    return 405;
-                }
-                if ($http_cookie ~ (wp-postpass|wordpress_logged_in|comment_author)_ ){
-                    return 405;
-                }
-                
-                default_type text/html;
-                add_header X-Powered-By Cachify;
-                set $memcached_key $http_host$uri;
-                memcached_pass localhost:11211;
-            }
-                {% else %}
-                
-            try_files $cache_enabler_uri $uri $uri/ $custom_subdir/index.php?$args;
-
-                {% endif %}
-
-            {% elif item.nginx.laravel == 1 %}   
-
-            try_files $uri $uri/ /index.php?$query_string;
-
-            {% else %}
-
-            return 301 https://sbaerlo.ch/er;
-            add_header  X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
-
-            {% endif %}
-        }
-
-        {%  if item.nginx.php == 1  %}
-
-            {% include "app/php.j2" %}
-
-        {% endif %}
-
-        {%  if item.nginx.wordpress == 1  %}
+        {%  if item.stack == 'wordpress'  %}
  
         {% include "app/wordpress.j2" %}
-
-        {% endif %}  
     
-        {%  if item.nginx.laravel == 1  %}
+        {%  elif item.stack == 'laravel'  %}
  
         {% include "app/laravel.j2" %}
+
+        {% else %}
+        
+        location / {
+
+            return 301 https://sbaerlo.ch/er; 
+            add_header  X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
+        }
 
         {% endif %}  
         
@@ -177,7 +116,15 @@
         # any requests that come in that match any these names will use the proxy.
         server_name {{ alias }};
 
+        {% if item.nginx.laravel == 1 %}   
+
+        root /home/{{ item.site }}/public;
+
+        {% else %}
+        
         root /home/{{ item.site }};
+       
+        {% endif %}
 
         {% if item.nginx.ssl == 1 %}
 
@@ -187,35 +134,10 @@
 
         {% endif %}
 
-        #Access Logs
-        access_log /var/log/nginx/{{ alias }}.access.log;
-        
-        #Error Logs
-        error_log /var/log/nginx/{{ alias }}.error.log;
-
         {% include "default/status.j2" %}   
 
         {% include "default/header.j2" %}
 
-        location / {
-
-            {% if item.nginx.wordpress == 1 %}
-
-            try_files $cache_enabler_uri $uri $uri/ $custom_subdir/index.php?$args;
-
-            {% else %}
-
-            return 301 https://sbaerlo.ch/er;
-            add_header  X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
-
-            {% endif %}
-        }
-
-        {%  if item.nginx.php == 1  %}
-
-            {% include "app/php.j2" %}
-
-        {% endif %}
 
         {%  if item.nginx.wordpress == 1  %}
  

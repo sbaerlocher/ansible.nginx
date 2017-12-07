@@ -1,9 +1,3 @@
-	location /status {
-	    stub_status on;
-	    allow 62.113.202.39;
-	    deny all;
-	}
-
 	location /{{ item.site | hash('md5') }}/status {
 	    stub_status on;
 	    allow 62.113.202.39;
