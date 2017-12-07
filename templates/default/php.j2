@@ -1,0 +1,10 @@
+    location ~ \.php$ {
+        try_files $uri =404;
+        fastcgi_index index.php;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_intercept_errors on;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_pass unix:{{ nginx_pool_listen }}/{{ item.site }}.sock;
+        fastcgi_param  HTTPS on;
+        include fastcgi_params;
+    }

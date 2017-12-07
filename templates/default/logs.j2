@@ -10,3 +10,9 @@
         access_log off;
         log_not_found off;
     }
+
+    #Access Logs
+    access_log /var/log/nginx/{{ item.site }}.access.log;
+        
+    #Error Logs
+    error_log /var/log/nginx/{{ item.site }}.error.log warn;

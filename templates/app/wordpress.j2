@@ -1,11 +1,52 @@
-	{% if item.nginx.memcached == 1 %}
+root /home/{{ item.site }};
+	   
+location / {
+
+    {% if item.nginx.memcached == 1 %}
+
+    location / {
+                
+		error_page 404 405 = @nocache;
+                
+        if ($query_string = true){
+            return 405;
+        }
+    
+        if ($request_method = POST){
+            return 405;
+        }
+        
+        if ($request_uri ~ "/wp-"){
+            return 405;
+        }
+    
+	    if ($http_cookie ~ (wp-postpass|wordpress_logged_in|comment_author)_ ){
+            return 405;
+        }
+                
+        default_type text/html;
+        add_header X-Powered-By Cachify;
+        set $memcached_key $http_host$uri;
+        memcached_pass localhost:11211;
+        
+    }
+                
+	{% else %}
+                
+    try_files $cache_enabler_uri $uri $uri/ $custom_subdir/index.php?$args;
+
+    {% endif %}
+
+}
+		
+{% if item.nginx.memcached == 1 %}
     
     ## nocache
     location @nocache{
         try_files $uri $uri/ /index.php?$args;
     }
     
-    {% else %}
+{% else %}
 	set $cache_uri $request_uri;
 
 	# bypass cache if POST requests or URLs with a query string
@@ -36,7 +77,7 @@
 	if ($http_accept ~* "image/webp") {
 	    set $cache_enabler_uri '${custom_subdir}/wp-content/cache/cache-enabler/${http_host}${cache_uri}index-webp.html';
 	}
-    {% endif %}
+{% endif %}
 
 	rewrite ^/sitemap.xml$ /index.php last;
 	rewrite ^/news-sitemap.xml$ /index.php last;
@@ -87,6 +128,4 @@
 	    add_header Access-Control-Allow-Origin "*";
     }
 
-	{% if item.nginx.cdn == 1 %}
-
-	{% endif %}
+{% include "default/php.j2" %}
