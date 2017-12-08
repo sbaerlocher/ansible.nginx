@@ -56,8 +56,6 @@
     mode: "0644"
   with_items:
     - ssl
-    - ssl-stapling
-    - gzip_static
     - gzip
     - fastcgi
   notify:
