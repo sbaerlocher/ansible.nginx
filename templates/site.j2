@@ -59,7 +59,7 @@
         {% else %}
         
         location / {
-            return 301 https://sbaerlo.ch/er/?ref=$server_name&pk_campaign=redirection&pk_kwd=$server_name;
+            return 302 https://sbaerlo.ch/er/?ref=$server_name&pk_campaign=redirection&pk_kwd=$server_name;
         }
 
         {% endif %}  
@@ -133,7 +133,7 @@
         {% else %}
         
         location / {
-            return 301 https://sbaerlo.ch/er/?ref=$server_name&pk_campaign=redirection&pk_kwd=$server_name;
+            return 302 https://sbaerlo.ch/er/?ref=$server_name&pk_campaign=redirection&pk_kwd=$server_name;
         }
 
         {% endif %}  
