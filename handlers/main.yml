@@ -14,7 +14,7 @@
 - name: enabled nginx
   service:
     name: "{{ nginx_service_name }}"
-    enabled: yes
+    enabled: true
 
 - name: removing default nginx host
   file:

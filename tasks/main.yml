@@ -19,8 +19,8 @@
     name: nginx
     description: official nginx repo
     baseurl: http://nginx.org/packages/centos/$releasever/$basearch/
-    gpgcheck: no
-    enabled: yes
+    gpgcheck: false
+    enabled: true
   when: ansible_distribution == 'CentOS'
   tags:
     - packages
@@ -129,33 +129,125 @@
   tags:
     - configuration
 
+
+## SSL
 - block:
+
     - name: Creates SSL Home
-      file: path=/etc/ssl/nginx/{{ item.site }} state=directory mode=0644
+      file:
+        path: "/etc/ssl/nginx/{{ item.site }}"
+        state: directory
+        mode: 0644
       with_items: "{{ sites }}"
-    - name: Creates Certbot zert
-      file: src=/etc/letsencrypt/live/{{ item.site }}/fullchain.pem dest=/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem state=link mode=0644
-      with_items: "{{ sites }}"
+
+    ## inline SSL
+    - block:
+
+        - name: Create Key
+          copy:
+            content: "{{ item.ssl.key }}"
+            dest: "/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key"
+            mode: 0644
+          with_items: "{{ sites }}"
+          when: item.ssl.key is defined
+
+        - name: Create CA
+          copy:
+            content: "{{ item.ssl.ca }}"
+            dest: "/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem"
+            mode: 0644
+          with_items: "{{ sites }}"
+          when: item.ssl.ca is defined
+    # inline SSL End
+
+    # Certbot
+    - block:
+
+        - name: Creates Key from Certbot
+          file:
+            src: "/etc/letsencrypt/live/{{ item.site }}/privkey.pem"
+            dest: "/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key"
+            state: link
+            mode: 0644
+          with_items: "{{ sites }}"
+
+        - name: Creates CA from Certbot
+          file:
+            src: "/etc/letsencrypt/live/{{ item.site }}/fullchain.pem"
+            dest: "/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem"
+            state: link
+            mode: 0644
+          with_items: "{{ sites }}"
+
       when: item.nginx.certbot
-    - name: Creates Certbot key
-      file: src=/etc/letsencrypt/live/{{ item.site }}/privkey.pem dest=/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key state=link mode=0644
-      with_items: "{{ sites }}"
-      when: item.nginx.certbot
-    - name: Creates default zert
-      file: src=/etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.pem dest=/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem state=link mode=0644
-      with_items: "{{ sites }}"
-      when: not item.nginx.certbot
-    - name: Creates default key
-      file: src=/etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.key dest=/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key state=link mode=0644
-      with_items: "{{ sites }}"
-      when: not item.nginx.certbot
-  when: item.nginx.ssl and nginx_default_ssl != item.site
+    # Certbot End
+
+    # Empty
+    - block:
+
+        - name: Creates Empty Key
+          file:
+            src: "/etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.key"
+            dest: "/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key"
+            state: link
+            mode: 0644
+            force: true
+          with_items: "{{ sites }}"
+
+        - name: Creates Empty CA
+          file:
+            src: "/etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.pem"
+            dest: "/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem"
+            state: link
+            mode: 0644
+            force: true
+          with_items: "{{ sites }}"
+
+      when: not item.nginx.certbot and not item.ssl and nginx_default_ssl != item.site
+    # Empty End
+  when: item.nginx.ssl
+  tags:
+    - configuration
+
+# Alias
+- block:
+
+    # Alias Empty
+    - block:
+
+        - name: Creates Empty alias Key
+          file:
+            src: "/etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.key"
+            dest: "/etc/ssl/nginx/{{ item.0.site }}/{{ item.1 }}.key"
+            state: link
+            mode: 0644
+            force: true
+          with_subelements:
+            - "{{ sites }}"
+            - alias
+
+        - name: Creates Empty alias CA
+          file:
+            src: "/etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.pem"
+            dest: "/etc/ssl/nginx/{{ item.0.site }}/{{ item.1 }}.pem"
+            state: link
+            mode: 0644
+            force: true
+          with_subelements:
+            - "{{ sites }}"
+            - alias
+    # Alias Empty End
+
+  # Alias End
+  when: item.0.nginx.ssl and item.1 is defined
   tags:
     - configuration
 
 - name: Generate DHE key-exchange
-  become: yes
-  command: openssl dhparam -dsaparam -out /etc/ssl/certs/dhparam.pem 4096 creates=/etc/ssl/certs/dhparam.pem
+  become: true
+  command: openssl dhparam -dsaparam -out /etc/ssl/certs/dhparam.pem arg1
+  args:
+    creates: /etc/ssl/certs/dhparam.pem
   notify:
     - restart nginx
   tags:
