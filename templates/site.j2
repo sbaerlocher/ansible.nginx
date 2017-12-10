@@ -56,6 +56,10 @@
  
         {% include "app/laravel.j2" %}
 
+        {%  elif item.stack == 'static'  %}
+ 
+        {% include "app/static.j2" %}
+
         {% else %}
         
         location / {
@@ -71,15 +75,17 @@
         {% include "default/logs.j2" %}
     }
 
-{% if item.alias is defined %}
+{% if item.alias %}
+
 #####################################################################################
 #################################### Alias ##########################################
-#####################################################################################
+##################################################################################### 
 
     {% for alias in item.alias %}
 
         {% if item.alias is defined %}
 
+        ############## {{ alias }}
         server {
         
         listen 443 ssl http2;
@@ -129,6 +135,10 @@
         {%  elif item.stack == 'laravel'  %}
  
         {% include "app/laravel.j2" %}
+
+        {%  elif item.stack == 'static'  %}
+ 
+        {% include "app/static.j2" %}
 
         {% else %}
         
