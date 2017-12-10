@@ -1,0 +1,12 @@
+---
+# tasks file for sbaerlocher.nginx
+
+- name: add official nginx repo
+  yum_repository:
+    name: nginx
+    description: official nginx repo
+    baseurl: http://nginx.org/packages/centos/$releasever/$basearch/
+    gpgcheck: false
+    enabled: true
+  tags:
+    - packages

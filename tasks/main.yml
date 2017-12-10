@@ -14,14 +14,16 @@
     - configuration
     - packages
 
-- name: add official nginx repo
-  yum_repository:
-    name: nginx
-    description: official nginx repo
-    baseurl: http://nginx.org/packages/centos/$releasever/$basearch/
-    gpgcheck: false
-    enabled: true
-  when: ansible_distribution == 'CentOS'
+- name: Distribution | Include
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
+        - "{{ ansible_distribution }}.yml"
+        - "{{ ansible_os_family }}.yml"
+        - "defaults.yml"
+      paths:
+        - "distribution"
   tags:
     - packages
 
