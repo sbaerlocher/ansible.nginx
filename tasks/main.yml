@@ -214,30 +214,56 @@
 # Alias
 - block:
 
+    ## inline SSL
+    - block:
+
+        - name: Create alias Key
+          copy:
+            content: "{{ item.1.key }}"
+            dest: "/etc/ssl/nginx/{{ item.0.site }}/{{ item.1.name }}.key"
+            mode: 0644
+          with_subelements:
+            - "{{ sites }}"
+            - alias
+          when: item.1.key is defined
+
+        - name: Create alias CA
+          copy:
+            content: "{{ item.1.ca }}"
+            dest: "/etc/ssl/nginx/{{ item.0.site }}/{{ item.1.name }}.pem"
+            mode: 0644
+          with_subelements:
+            - "{{ sites }}"
+            - alias
+          when: item.1.ca is defined
+    # inline SSL End
+
     # Alias Empty
     - block:
 
         - name: Creates Empty alias Key
           file:
             src: "/etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.key"
-            dest: "/etc/ssl/nginx/{{ item.0.site }}/{{ item.1 }}.key"
+            dest: "/etc/ssl/nginx/{{ item.0.site }}/{{ item.1.name }}.key"
             state: link
             mode: 0644
             force: true
           with_subelements:
             - "{{ sites }}"
             - alias
+          when: item.1.key is not defined
 
         - name: Creates Empty alias CA
           file:
             src: "/etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.pem"
-            dest: "/etc/ssl/nginx/{{ item.0.site }}/{{ item.1 }}.pem"
+            dest: "/etc/ssl/nginx/{{ item.0.site }}/{{ item.1.name }}.pem"
             state: link
             mode: 0644
             force: true
           with_subelements:
             - "{{ sites }}"
             - alias
+          when: item.1.ca is not defined
     # Alias Empty End
 
   # Alias End

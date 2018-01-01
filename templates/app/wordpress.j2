@@ -1,4 +1,12 @@
+{% if item.wordpress.subfolder %}
+
+root /home/{{ item.site }}/{{ item.wordpress.subfolder }};
+
+{% else %}
+                
 root /home/{{ item.site }};
+
+{% endif %}
 	   
 location / {
 
