@@ -5,6 +5,8 @@
   apt_key:
     url: "http://nginx.org/keys/nginx_signing.key"
     state: present
+  tags:
+    - packages
 
 - name: "{{ ansible_distribution | lower }} | add repository"
   apt_repository:
@@ -12,3 +14,5 @@
     state: present
     filename: "nginx"
     update_cache: true
+  tags:
+    - packages

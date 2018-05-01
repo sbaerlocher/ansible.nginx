@@ -4,6 +4,8 @@
 - name: "{{ ansible_distribution | lower }} | add key"
   apt_key:
     url: https://nginx.org/keys/nginx_signing.key
+  tags:
+    - packages
 
 - name: "{{ ansible_distribution | lower }} | add repository"
   yum_repository:

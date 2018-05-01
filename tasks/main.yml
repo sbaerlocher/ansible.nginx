@@ -1,49 +1,80 @@
 ---
 # tasks file for sbaerlocher.nginx
 
+
 - name: add OS specific variables
-  include_vars: "{{ item }}"
+  include_vars: "{{ loop_vars }}"
   with_first_found:
     - files:
         - "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
+        - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
         - "{{ ansible_distribution }}.yml"
         - "{{ ansible_os_family }}.yml"
-        - "default.yml"
-      paths: vars
+        - "{{ ansible_system }}.yml"
+        - "defaults.yml"
+      paths:
+        - "vars"
+  loop_control:
+    loop_var: loop_vars
   tags:
     - configuration
     - packages
 
-- name: Distribution | Include
-  include_tasks: "{{ item }}"
+- name: include distribution tasks
+  include_tasks: "{{ loop_distribution }}"
   with_first_found:
     - files:
         - "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
+        - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
         - "{{ ansible_distribution }}.yml"
         - "{{ ansible_os_family }}.yml"
+        - "{{ ansible_system }}.yml"
         - "defaults.yml"
       paths:
         - "distribution"
+  loop_control:
+    loop_var: loop_distribution
   tags:
+    - configuration
     - packages
 
+- name: creates nginx folders
+  become: true
+  file:
+    path: "{{ loop_directory.path }}"
+    state: directory
+    owner: "root"
+    group: "{{ nginx_user }}"
+    mode: "{{ loop_directory.mode }}"
+  loop_control:
+    loop_var: loop_directory
+  with_items:
+    - { path: "/etc/nginx/", mode: 751 }
+    - { path: "/etc/nginx/conf.d", mode: 751 }
+    - { path: "/etc/nginx/sites-available", mode: 751 }
+    - { path: "/etc/nginx/sites-enabled", mode: 751 }
+  tags:
+    - configuration
+
 - name: install nginx
+  become: true
   package:
     name: nginx
   notify:
+    - removing default nginx host
     - start nginx
     - enabled nginx
-    - removing default nginx host
   tags:
     - packages
 
 - name: configuring nginx
+  become: true
   template:
     src: nginx.j2
     dest: /etc/nginx/nginx.conf
     owner: root
-    group: root
-    mode: "0644"
+    group: "{{ nginx_user }}"
+    mode: "0640"
   notify:
     - restart nginx
   tags:
@@ -54,65 +85,56 @@
     src: "conf/{{ item }}.j2"
     dest: "/etc/nginx/conf.d/{{ item }}.conf"
     owner: root
-    group: root
-    mode: "0644"
+    group: "{{ nginx_user }}"
+    mode: "0640"
   with_items:
-    - ssl
-    - gzip
+    - amplify
+    - default
     - fastcgi
+    - gzip
+    - mine.types
+    - ssl
   notify:
     - restart nginx
   tags:
     - configuration
 
-- name: creates directory sites-available
-  file:
-    path: /etc/nginx/sites-available
-    state: directory
-  tags:
-    - configuration
-
-- name: creates directory sites-enabled
-  file:
-    path: /etc/nginx/sites-enabled
-    state: directory
-  tags:
-    - configuration
 
 - name: configuring sites
   template:
     src: site.j2
     dest: "/etc/nginx/sites-available/{{ item.site }}"
     owner: root
-    group: root
-    mode: "0644"
+    group: "{{ nginx_user }}"
+    mode: "0640"
   with_items:
     - "{{ sites }}"
   notify:
     - restart nginx
   when: item.site is defined
   tags:
-    - configuration
+    - sites
 
 - name: disable sites
   file:
     path: "/etc/nginx/sites-enabled/{{ item.site }}"
     state: absent
+    group: "{{ nginx_user }}"
   when: not item.enabled
   with_items:
     - "{{ sites }}"
   notify:
     - restart nginx
   tags:
-    - configuration
+    - sites
 
 - name: enabling sites
   file:
     src: "/etc/nginx/sites-available/{{ item.site }}"
     dest: "/etc/nginx/sites-enabled/{{ item.site }}"
     owner: root
-    group: root
-    mode: "0644"
+    group: "{{ nginx_user }}"
+    mode: "0640"
     state: link
   when: item.enabled
   with_items:
@@ -120,17 +142,7 @@
   notify:
     - restart nginx
   tags:
-    - configuration
-
-- name: Creates directory
-  file:
-    path: "/home/{{ item.site }}"
-    state: directory
-  with_items: "{{ sites }}"
-  when: item.site is defined
-  tags:
-    - configuration
-
+    - sites
 
 ## SSL
 - block:
@@ -139,7 +151,9 @@
       file:
         path: "/etc/ssl/nginx/{{ item.site }}"
         state: directory
-        mode: 0644
+        owner: root
+        group: "{{ nginx_user }}"
+        mode: 0550
       with_items: "{{ sites }}"
 
     ## inline SSL
@@ -149,16 +163,24 @@
           copy:
             content: "{{ item.ssl.key }}"
             dest: "/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key"
-            mode: 0644
+            owner: root
+            group: "{{ nginx_user }}"
+            mode: 0400
           with_items: "{{ sites }}"
+          notify:
+            - restart nginx
           when: item.ssl.key is defined
 
         - name: Create CA
           copy:
             content: "{{ item.ssl.ca }}"
             dest: "/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem"
-            mode: 0644
+            owner: root
+            group: "{{ nginx_user }}"
+            mode: 0440
           with_items: "{{ sites }}"
+          notify:
+            - restart nginx
           when: item.ssl.ca is defined
     # inline SSL End
 
@@ -170,7 +192,11 @@
             src: "/etc/letsencrypt/live/{{ item.site }}/privkey.pem"
             dest: "/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key"
             state: link
-            mode: 0644
+            owner: root
+            group: "{{ nginx_user }}"
+            mode: 0400
+          notify:
+            - restart nginx
           with_items: "{{ sites }}"
 
         - name: Creates CA from Certbot
@@ -178,10 +204,14 @@
             src: "/etc/letsencrypt/live/{{ item.site }}/fullchain.pem"
             dest: "/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem"
             state: link
-            mode: 0644
+            owner: root
+            group: "{{ nginx_user }}"
+            mode: 0440
+          notify:
+            - restart nginx
           with_items: "{{ sites }}"
 
-      when: item.nginx.certbot
+      when: item.ssl.certbot is defined
     # Certbot End
 
     # Empty
@@ -192,8 +222,12 @@
             src: "/etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.key"
             dest: "/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key"
             state: link
-            mode: 0644
+            owner: root
+            group: "{{ nginx_user }}"
+            mode: 0400
             force: true
+          notify:
+            - restart nginx
           with_items: "{{ sites }}"
 
         - name: Creates Empty CA
@@ -201,42 +235,53 @@
             src: "/etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.pem"
             dest: "/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem"
             state: link
-            mode: 0644
+            owner: root
+            group: "{{ nginx_user }}"
+            mode: 0440
             force: true
+          notify:
+            - restart nginx
           with_items: "{{ sites }}"
 
-      when: not item.nginx.certbot and not item.ssl and nginx_default_ssl != item.site
-    # Empty End
-  when: item.nginx.ssl
+      when: not item.ssl and nginx_default_ssl != item.site and item.ssl.certbot is not defined
+      # Empty End
   tags:
-    - configuration
+    - sites
 
 # Alias
 - block:
 
-    ## inline SSL
+    ## Alias inline SSL
     - block:
 
         - name: Create alias Key
           copy:
             content: "{{ item.1.key }}"
             dest: "/etc/ssl/nginx/{{ item.0.site }}/{{ item.1.name }}.key"
-            mode: 0644
+            owner: root
+            group: "{{ nginx_user }}"
+            mode: 0400
           with_subelements:
             - "{{ sites }}"
             - alias
+          notify:
+            - restart nginx
           when: item.1.key is defined
 
         - name: Create alias CA
           copy:
             content: "{{ item.1.ca }}"
             dest: "/etc/ssl/nginx/{{ item.0.site }}/{{ item.1.name }}.pem"
-            mode: 0644
+            owner: root
+            group: "{{ nginx_user }}"
+            mode: 0440
           with_subelements:
             - "{{ sites }}"
             - alias
+          notify:
+            - restart nginx
           when: item.1.ca is defined
-    # inline SSL End
+    # Alias inline SSL End
 
     # Alias Empty
     - block:
@@ -246,11 +291,15 @@
             src: "/etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.key"
             dest: "/etc/ssl/nginx/{{ item.0.site }}/{{ item.1.name }}.key"
             state: link
-            mode: 0644
+            owner: root
+            group: "{{ nginx_user }}"
+            mode: 0400
             force: true
           with_subelements:
             - "{{ sites }}"
             - alias
+          notify:
+            - restart nginx
           when: item.1.key is not defined
 
         - name: Creates Empty alias CA
@@ -258,24 +307,29 @@
             src: "/etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.pem"
             dest: "/etc/ssl/nginx/{{ item.0.site }}/{{ item.1.name }}.pem"
             state: link
-            mode: 0644
+            owner: root
+            group: "{{ nginx_user }}"
+            mode: 0440
             force: true
           with_subelements:
             - "{{ sites }}"
             - alias
+          notify:
+            - restart nginx
           when: item.1.ca is not defined
-    # Alias Empty End
+          # Alias Empty End
 
   # Alias End
-  when: item.0.nginx.ssl and item.1 is defined
+  when: item.1 is defined
   tags:
-    - configuration
+    - sites
 
 - name: Generate DHE key-exchange
   become: true
-  command: openssl dhparam -dsaparam -out /etc/ssl/certs/dhparam.pem arg1
+  command: openssl dhparam -dsaparam -out /etc/ssl/certs/dhparam.pem 4096
   args:
-    creates: /etc/ssl/certs/dhparam.pem
+    chdir: /etc/ssl/certs
+    creates: dhparam.pem
   notify:
     - restart nginx
   tags:
