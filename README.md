@@ -18,10 +18,7 @@ None
 
 ## Role Variables
 
-| Variable             | Default     | Comments (type)                                   |
-| :---                 | :---        | :---                                              |
-| | | |
-| | | |
+See defaults/main.yml
 
 ## Dependencies
 
@@ -36,6 +33,13 @@ None
 ```
 
 ## Changelog
+
+### 2.0
+
+* add tag sites
+* add folder premissons
+* update main task
+* new defaults template
 
 ### 1.3
 
