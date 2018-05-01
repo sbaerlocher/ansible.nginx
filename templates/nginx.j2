@@ -16,9 +16,14 @@ events {
 
 http {
 
-    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-                      '$status $body_bytes_sent "$http_referer" '
-                      '"$http_user_agent" "$http_x_forwarded_for"';
+    log_format  main_ext  '$remote_addr - $remote_user [$time_local] "$request" '
+                          '$status $body_bytes_sent "$http_referer" '
+                          '"$http_user_agent" "$http_x_forwarded_for" '
+                          '"$host" sn="$server_name" '
+                          'rt=$request_time '
+                          'ua="$upstream_addr" us="$upstream_status" '
+                          'ut="$upstream_response_time" ul="$upstream_response_length" '
+                          'cs=$upstream_cache_status' ;
 
     # Sendfile copies data between one FD and other from within the kernel. 
     # More efficient than read() + write(), since the requires transferring data to and from the user space.
@@ -61,7 +66,6 @@ http {
     open_file_cache_min_uses    {{ nginx_open_file_cache_min_uses }};
     open_file_cache_errors      {{ nginx_open_file_cache_errors }};
 
-    include             /etc/nginx/mime.types;
     default_type        application/octet-stream;
 
     # Buffer log writes to speed up IO, or disable them altogether
@@ -71,28 +75,6 @@ http {
     include /etc/nginx/conf.d/*.conf;
 
     index index.php index.html index.htm;
-
-    server {
-        
-        listen 80 default_server;
-
-        server_name _;
-        return 301 https://$host$request_uri;
-
-    }
-
-    server {
-        
-        listen 443 default_server;
-
-        server_name _;
-        return 302 {{ nginx_default_url }};
-
-        ssl on;
-        ssl_certificate /etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.pem;
-        ssl_certificate_key /etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.key;
-
-    }
 
     include /etc/nginx/sites-enabled/*;
 

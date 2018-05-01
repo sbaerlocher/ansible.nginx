@@ -1,5 +1,17 @@
-	location /{{ item.site | hash('md5') }}/status {
-	    stub_status on;
-	    allow 62.113.202.39;
-	    deny all;
+	location ~ ^/{{ item.site | hash('md5') }}/nginx/status {
+		{% for nginx_monitoring_server in nginx_monitoring_servers %}
+		allow {{ nginx_monitoring_server }};
+		{% endfor %}
+		deny all;
+		stub_status on;
+	}
+
+	location ~ ^/{{ item.site | hash('md5') }}/php/(status|ping)$ {
+		{% for nginx_monitoring_server in nginx_monitoring_servers %}
+		allow {{ nginx_monitoring_server }};
+		{% endfor %}
+		deny all;
+		{% include "default/fastcgi_params.j2" %}
+		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		fastcgi_pass unix:{{ nginx_pool_listen }}/{{ item.site }}.sock;
 	}

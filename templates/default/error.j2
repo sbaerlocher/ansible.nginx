@@ -10,6 +10,6 @@
     error_page 503 /maintenance/503;
     error_page 504 /overload/504;
  
-    location ~/(error|overload|maintenance)/(40[345]|50[01234]) {
+    location ~ ^/(error|overload|maintenance)/(40[345]|50[01234])$ {
         return 302 https://sbaerlo.ch/er/$1/?ref=$server_name&pk_campaign=$1&pk_kwd=$server_name&page=$2;
     }

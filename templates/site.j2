@@ -2,17 +2,26 @@
 
     server {
         
-        listen 443 ssl http2;
+        listen 80;
+
+        server_name www.{{ item.site }} {{ item.site }};
+
+        location / {
+  
+            return 301 https://{{ item.site }};
+
+        }
+
+    }
+
+    server {
+        
+        listen 443 ssl http2;     
 
         server_name www.{{ item.site }};
 
-        {% if item.nginx.ssl %}
-
-        ssl on;
         ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem;
         ssl_certificate_key /etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key;
-
-        {% endif %}
 
         location / {
   
@@ -36,17 +45,10 @@
         # any requests that come in that match any these names will use the proxy.
         server_name {{ item.site }};
 
-        {% if item.nginx.ssl %}
-
-        ssl on;
         ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem;
         ssl_certificate_key /etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key;
 
-        {% endif %}  
-
         {% include "default/status.j2" %}        
-
-        {% include "default/header.j2" %}
 
         {%  if item.stack == 'wordpress'  %}
  
@@ -94,13 +96,8 @@
 
         return 301 https://{{ alias.name }};
 
-            {% if item.nginx.ssl %}
-
-        ssl on;
         ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ alias.name }}.pem;
         ssl_certificate_key /etc/ssl/nginx/{{ item.site }}/{{ alias.name }}.key;
-
-            {% endif %}
 
         {% endif %}
 
@@ -116,17 +113,10 @@
         # any requests that come in that match any these names will use the proxy.
         server_name {{ alias.name }};
 
-        {% if item.nginx.ssl %}
-
-        ssl on;
         ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ alias.name }}.pem;
         ssl_certificate_key /etc/ssl/nginx/{{ item.site }}/{{ alias.name }}.key;
 
-        {% endif %}  
-
         {% include "default/status.j2" %}        
-
-        {% include "default/header.j2" %}
 
         {%  if item.stack == 'wordpress'  %}
  
