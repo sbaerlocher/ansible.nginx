@@ -1,7 +1,11 @@
 ---
 # tasks file for sbaerlocher.nginx
 
-- name: add official nginx repo
+- name: "{{ ansible_distribution | lower }} | add key"
+  apt_key:
+    url: https://nginx.org/keys/nginx_signing.key
+
+- name: "{{ ansible_distribution | lower }} | add repository"
   yum_repository:
     name: nginx
     description: official nginx repo
