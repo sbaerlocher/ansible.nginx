@@ -13,5 +13,5 @@
 		deny all;
 		{% include "default/fastcgi_params.j2" %}
 		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-		fastcgi_pass unix:{{ nginx_pool_listen }}/{{ item.site }}.sock;
+		fastcgi_pass unix:{{ nginx_pool_dir }}/{{ item.site }}.sock;
 	}
