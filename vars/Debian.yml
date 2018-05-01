@@ -1,4 +1,11 @@
 ---
 # vars file for sbaerlocher.nginx
 
+# nginx service name
 nginx_service_name: nginx
+
+# nginx user
+nginx_user: www-data
+
+# php pool dir
+nginx_pool_dir: /run/php

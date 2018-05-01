@@ -1,0 +1,11 @@
+root /home/{{ item.site }}/public;
+                
+location / {
+
+    try_files $uri $uri/ /index.php?$query_string;
+
+    {% include "default/header.j2" %}
+
+}
+        
+{% include "default/php.j2" %}

@@ -42,3 +42,13 @@ ssl_session_timeout  24h;
 # Consider using OCSP Stapling as shown in ssl-stapling.conf 
  
 ssl_dhparam /etc/ssl/certs/dhparam.pem;
+
+# OCSP stapling... 
+ssl_stapling on; 
+ssl_stapling_verify on; 
+ 
+#trusted cert must be made up of your intermediate certificate followed by root certificate 
+#ssl_trusted_certificate /path/to/ca.crt; 
+ 
+resolver 8.8.8.8 8.8.4.4 valid=60s; 
+resolver_timeout 2s; 
