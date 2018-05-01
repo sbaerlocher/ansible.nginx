@@ -5,6 +5,8 @@ nginx_webroot: /home
 
 nginx_default_error_page: false
 
+nginx_branch: mainline
+
 nginx_default_url: []
 
 nginx_default_ssl: []
@@ -13,18 +15,18 @@ nginx_default_user: "nginx"
 
 nginx_default_release: ""
 
-nginx_worker_processes: "1"
+nginx_worker_processes: auto
 nginx_worker_connections: "1024"
 
 nginx_error_log: "/var/log/nginx/error.log warn"
-nginx_access_log: "/var/log/nginx/access.log main buffer=16k"
+nginx_access_log: "/var/log/nginx/access.log main_ext buffer=16k"
 
 nginx_sendfile: "on"
 nginx_tcp_nopush: "on"
 nginx_tcp_nodelay: "on"
 nginx_server_tokens: "off"
 
-nginx_keepalive_timeout: "45 20"
+nginx_keepalive_timeout: "5 5"
 nginx_keepalive_requests: "1000"
 
 nginx_reset_timedout_connection: "on"
@@ -94,6 +96,7 @@ nginx_ssl_ciphers:
   - "!EDH-DSS-DES-CBC3-SHA"
   - "!EDH-RSA-DES-CBC3-SHA"
   - "!KRB5-DES-CBC3-SHA"
+  - "!3DES"
 
 nginx_proxy: []
 #  - name: plex.sbaerlo.ch
