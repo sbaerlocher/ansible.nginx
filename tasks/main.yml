@@ -19,6 +19,7 @@
   tags:
     - configuration
     - packages
+    - sites
 
 - name: include distribution tasks
   include_tasks: "{{ loop_distribution }}"
