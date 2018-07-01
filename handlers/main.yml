@@ -15,8 +15,3 @@
   service:
     name: "{{ nginx_service_name }}"
     enabled: true
-
-- name: removing default nginx host
-  file:
-    path: "/etc/nginx/sites-available/default"
-    state: absent

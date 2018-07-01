@@ -34,6 +34,10 @@ None
 
 ## Changelog
 
+### 2.0.1
+
+* change task for removeing default host
+
 ### 2.0
 
 * add tag sites

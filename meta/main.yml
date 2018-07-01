@@ -1,5 +1,6 @@
 ---
 galaxy_info:
+  role_name: nginx
   author: Simon Baerlocher <sbaerlocher@sbaerlocher.ch>
   description: Install and configure Nginx.
   license: license (MIT)
