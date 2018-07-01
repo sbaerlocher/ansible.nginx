@@ -62,11 +62,17 @@
   package:
     name: nginx
   notify:
-    - removing default nginx host
     - start nginx
     - enabled nginx
   tags:
     - packages
+
+- name: removing default nginx host
+  file:
+    path: "/etc/nginx/sites-available/default"
+    state: absent
+  tags:
+    - configuration
 
 - name: configuring nginx
   become: true
