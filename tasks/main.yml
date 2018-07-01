@@ -69,8 +69,11 @@
 
 - name: removing default nginx host
   file:
-    path: "/etc/nginx/sites-available/default"
+    path: "/etc/nginx/{{ item }}/default"
     state: absent
+  with_items:
+    - sites-available
+    - sites-enabled
   tags:
     - configuration
 
