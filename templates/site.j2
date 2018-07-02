@@ -85,10 +85,20 @@
 
     {% for alias in item.alias %}
 
-        {% if item.alias is defined %}
+    ############## {{ alias.name }}
+    server {
+        
+        listen 80;
 
-        ############## {{ alias.name }}
-        server {
+        server_name www.{{ alias.name }} {{  alias.name  }};
+
+        location / {
+            return 301 https://{{  alias.name  }};
+        }
+
+    }
+
+    server {
         
         listen 443 ssl http2;
 
@@ -98,8 +108,6 @@
 
         ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ alias.name }}.pem;
         ssl_certificate_key /etc/ssl/nginx/{{ item.site }}/{{ alias.name }}.key;
-
-        {% endif %}
 
     }
 

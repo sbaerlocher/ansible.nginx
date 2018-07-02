@@ -34,6 +34,10 @@ None
 
 ## Changelog
 
+### 2.0.2
+
+* fix alias redirect from port 80
+
 ### 2.0.1
 
 * change task for removeing default host
