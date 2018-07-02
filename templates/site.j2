@@ -109,8 +109,6 @@
         ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ alias.name }}.pem;
         ssl_certificate_key /etc/ssl/nginx/{{ item.site }}/{{ alias.name }}.key;
 
-        {% endif %}
-
     }
 
     server {
