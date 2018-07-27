@@ -34,6 +34,10 @@ None
 
 ## Changelog
 
+### 2.0.3
+
+* add tags in cert tasks
+
 ### 2.0.2
 
 * fix alias redirect from port 80
