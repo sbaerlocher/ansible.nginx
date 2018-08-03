@@ -37,6 +37,8 @@ None
 ### 2.1.0
 
 * add ipv6 support
+* add tag in certs tasks
+* update travis
 
 ### 2.0.3
 
