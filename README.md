@@ -34,6 +34,10 @@ None
 
 ## Changelog
 
+### 2.1.0
+
+* add ipv6 support
+
 ### 2.0.3
 
 * add tags in cert tasks
