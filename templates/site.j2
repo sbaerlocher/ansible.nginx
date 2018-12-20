@@ -2,7 +2,7 @@
 
     server {
         
-        listen [::]:80;
+        listen {% if ansible_default_ipv6 %}[::]:{% endif %}80;
 
         server_name www.{{ item.site }} {{ item.site }};
 
@@ -16,12 +16,13 @@
 
     server {
         
-        listen [::]:443 ssl http2;     
+        listen {% if ansible_default_ipv6 %}[::]:{% endif %}443 ssl http2;
 
         server_name www.{{ item.site }};
 
-        ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem;
-        ssl_certificate_key /etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key;
+        ssl on;
+        ssl_certificate {{ nginx_certificate[item.stack].ssl_certificate }};
+        ssl_certificate_key {{ nginx_certificate[item.stack].ssl_certificate_key }};
 
         location / {
   
@@ -33,7 +34,7 @@
 
     server {
 
-        listen [::]:443 ssl http2;
+        listen {% if ansible_default_ipv6 %}[::]:{% endif %}443 ssl http2;
 
         server_tokens off;
 
@@ -45,22 +46,15 @@
         # any requests that come in that match any these names will use the proxy.
         server_name {{ item.site }};
 
-        ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem;
-        ssl_certificate_key /etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key;
+        ssl on;
+        ssl_certificate {{ nginx_certificate[item.stack].ssl_certificate }};
+        ssl_certificate_key {{ nginx_certificate[item.stack].ssl_certificate_key }};
 
         {% include "default/status.j2" %}        
 
-        {%  if item.stack == 'wordpress'  %}
+        {% if item.stack in nginx_stacks %}
  
-        {% include "app/wordpress.j2" %}
-    
-        {%  elif item.stack == 'laravel'  %}
- 
-        {% include "app/laravel.j2" %}
-
-        {%  elif item.stack == 'static'  %}
- 
-        {% include "app/static.j2" %}
+        {% include "app/" + item.stack + ".j2" %}
 
         {% else %}
         
@@ -72,7 +66,11 @@
         
         {% include "default/error.j2" %}
     
+        {%  if item.stack != 'proxmox' %}
+
         {% include "default/cache.j2" %}
+
+        {% endif %}  
 
         {% include "default/logs.j2" %}
     }
@@ -88,7 +86,7 @@
     ############## {{ alias.name }}
     server {
         
-        listen [::]:80;
+        listen {% if ansible_default_ipv6 %}[::]:{% endif  %}80;
 
         server_name www.{{ alias.name }} {{  alias.name  }};
 
@@ -100,12 +98,13 @@
 
     server {
         
-        listen [::]:443 ssl http2;
+        listen {% if ansible_default_ipv6 %}[::]:{% endif  %}443 ssl http2;
 
         server_name www.{{ alias.name }};
 
         return 301 https://{{ alias.name }};
 
+        ssl on;
         ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ alias.name }}.pem;
         ssl_certificate_key /etc/ssl/nginx/{{ item.site }}/{{ alias.name }}.key;
 
@@ -113,7 +112,7 @@
 
     server {
 
-        listen [::]:443 ssl http2;
+        listen {% if ansible_default_ipv6 %}[::]:{% endif  %}443 ssl http2;
 
         server_tokens off;
         
@@ -121,22 +120,15 @@
         # any requests that come in that match any these names will use the proxy.
         server_name {{ alias.name }};
 
-        ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ alias.name }}.pem;
-        ssl_certificate_key /etc/ssl/nginx/{{ item.site }}/{{ alias.name }}.key;
+        ssl on;
+        ssl_certificate {{ nginx_certificate[item.stack].ssl_certificate }};
+        ssl_certificate_key {{ nginx_certificate[item.stack].ssl_certificate_key }};
 
         {% include "default/status.j2" %}        
 
-        {%  if item.stack == 'wordpress'  %}
+        {% if item.stack in nginx_stacks %}
  
-        {% include "app/wordpress.j2" %}
-    
-        {%  elif item.stack == 'laravel'  %}
- 
-        {% include "app/laravel.j2" %}
-
-        {%  elif item.stack == 'static'  %}
- 
-        {% include "app/static.j2" %}
+        {% include "app/" + item.stack + ".j2" %}
 
         {% else %}
         
@@ -148,7 +140,11 @@
         
         {% include "default/error.j2" %}
     
+        {%  if item.stack != 'proxmox' %}
+
         {% include "default/cache.j2" %}
+
+        {% endif %}  
 
         {% include "default/logs.j2" %}
 

@@ -98,34 +98,27 @@ nginx_ssl_ciphers:
   - "!KRB5-DES-CBC3-SHA"
   - "!3DES"
 
-nginx_proxy: []
-#  - name: plex.sbaerlo.ch
-#    state: present
-#    server_name: plex.sbaerlo.ch
-#    ssl:
-#     ssl: "on"
-#     ssl_certificate: "/etc/ssl/nginx/sbaerlo.ch/sbaerlo.ch.pem"
-#     ssl_certificate_key: "/etc/ssl/nginx/sbaerlo.ch/sbaerlo.ch.key"
-#    scheme: https
-#    host: localhost
-#    port: 32400
+nginx_default_certificate: '/etc/pve/local/pve-ssl.pem'
+nginx_default_certificate_key: '/etc/pve/local/pve-ssl.key'
 
-nginx_sites: []
-#  - name: sbaerlo.ch
-#    state: present
-#    server_name: sbaerlo.ch
-#    root: "/srv"
-#    ssl:
-#     ssl: on
-#     ssl_certificate: "/etc/ssl/nginx/sbaerlo.ch/sbaerlo.ch.pem"
-#     ssl_certificate_key: "/etc/ssl/nginx/sbaerlo.ch/sbaerlo.ch.key"
-#    interpreter:
-#     hhvm: yes
-#     php: no
-#    conf:
-#     wordpress: yes
-#    rules:
-#    location: []
-#       - name:
-#         location:
-#         regel:
+nginx_default_server: true
+
+nginx_certificate:
+  proxmox:
+    ssl_certificate: '/etc/pve/local/pve-ssl.pem'
+    ssl_certificate_key: '/etc/pve/local/pve-ssl.key'
+  wordpress:
+    ssl_certificate: '/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem'
+    ssl_certificate_key: '/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key'
+  laravel:
+    ssl_certificate: '/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem'
+    ssl_certificate_key: '/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key'
+  static:
+    ssl_certificate: '/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem'
+    ssl_certificate_key: '/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key'
+
+nginx_stacks:
+  - proxmox
+  - wordpress
+  - laravel
+  - static

@@ -1,7 +1,6 @@
 ---
 # tasks file for sbaerlocher.nginx
 
-
 - name: add OS specific variables
   include_vars: "{{ loop_vars }}"
   with_first_found:
@@ -50,10 +49,14 @@
   loop_control:
     loop_var: loop_directory
   with_items:
-    - { path: "/etc/nginx/", mode: 751 }
-    - { path: "/etc/nginx/conf.d", mode: 751 }
-    - { path: "/etc/nginx/sites-available", mode: 751 }
-    - { path: "/etc/nginx/sites-enabled", mode: 751 }
+    - path: "/etc/nginx/"
+      mode: 751
+    - path: "/etc/nginx/conf.d"
+      mode: 751
+    - path: "/etc/nginx/sites-available"
+      mode: 751
+    - path: "/etc/nginx/sites-enabled"
+      mode: 751
   tags:
     - configuration
 
@@ -68,6 +71,7 @@
     - packages
 
 - name: removing default nginx host
+  become: true
   file:
     path: "/etc/nginx/{{ item }}/default"
     state: absent
@@ -91,6 +95,7 @@
     - configuration
 
 - name: adding conf.d
+  become: true
   template:
     src: "conf/{{ item }}.j2"
     dest: "/etc/nginx/conf.d/{{ item }}.conf"
@@ -111,6 +116,7 @@
 
 
 - name: configuring sites
+  become: true
   template:
     src: site.j2
     dest: "/etc/nginx/sites-available/{{ item.site }}"
@@ -126,6 +132,7 @@
     - sites
 
 - name: disable sites
+  become: true
   file:
     path: "/etc/nginx/sites-enabled/{{ item.site }}"
     state: absent
@@ -139,6 +146,7 @@
     - sites
 
 - name: enabling sites
+  become: true
   file:
     src: "/etc/nginx/sites-available/{{ item.site }}"
     dest: "/etc/nginx/sites-enabled/{{ item.site }}"
