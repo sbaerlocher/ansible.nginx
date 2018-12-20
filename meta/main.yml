@@ -2,9 +2,9 @@
 galaxy_info:
   role_name: nginx
   author: Simon Baerlocher <sbaerlocher@sbaerlocher.ch>
-  description: Install and configure Nginx.
-  license: license (MIT)
-  min_ansible_version: 2.2
+  description: This role installs nginx on different Linux systems and can run multiple nginx servers.
+  license: MIT
+  min_ansible_version: 2.5
   platforms:
     - name: Archlinux
       versions:
@@ -27,8 +27,11 @@ galaxy_info:
     - name: Debian
       versions:
         - wheezy
-  categories:
+
+  galaxy_tags:
     - system
     - web
+    - webserver
+    - nginx
 
 dependencies: []
