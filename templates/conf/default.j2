@@ -1,15 +1,10 @@
     server {
         
         listen 80 default_server;
-        listen 443 ssl http2 default_server;
 
         server_name _;
         {% if nginx_default_url is defined %} 
         return 302 {{ nginx_default_url }};       
         {% endif %}
 
-        {% if nginx_default_ssl is defined %} 
-        ssl_certificate /etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.pem;
-        ssl_certificate_key /etc/ssl/nginx/{{ nginx_default_ssl }}/{{ nginx_default_ssl }}.key;
-        {% endif %}
     }

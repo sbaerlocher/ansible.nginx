@@ -1,6 +1,6 @@
 # Ansible Role: Nginx
 
-[![Build Status](https://travis-ci.org/sbaerlocher/ansible.nginx.svg?branch=master)](https://travis-ci.org/sbaerlocher/ansible.nginx) [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://sbaerlo.ch/licence) [![Ansible Galaxy](http://img.shields.io/badge/ansible--galaxy-nginx-blue.svg)](https://galaxy.ansible.com/sbaerlocher/nginx)
+[![Build Status](https://img.shields.io/travis-ci/sbaerlocher/ansible.nginx.svg?branch=master&style=popout-square)](https://travis-ci.org/sbaerlocher/ansible.nginx) [![license](https://img.shields.io/github/license/mashape/apistatus.svg?style=popout-square)](https://sbaerlo.ch/licence) [![Ansible Galaxy](http://img.shields.io/badge/ansible--galaxy-nginx-blue.svg?style=popout-square)](https://galaxy.ansible.com/sbaerlocher/nginx) [![Ansible Role](https://img.shields.io/ansible/role/d/22078.svg?style=popout-square)](https://galaxy.ansible.com/sbaerlocher/nginx)
 
 ## Description
 
@@ -33,6 +33,10 @@ None
 ```
 
 ## Changelog
+
+### 2.2.0
+
+* add proxmox support
 
 ### 2.1.0
 
@@ -86,4 +90,4 @@ This project is under the MIT License. See the [LICENSE](https://sbaerlo.ch/lice
 
 ## Copyright
 
-(c) 2016, Simon Bärlocher
+(c) 2019, Simon Bärlocher

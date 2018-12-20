@@ -8,6 +8,8 @@
 		stub_status on;
 	}
 
+	{%  if item.stack != 'proxmox' %}
+
 	location ~ ^/{{ item.site | hash('md5') }}/php/(status|ping)$ {
 		{% if nginx_monitoring_servers is defined %} 
 		{% for nginx_monitoring_server in nginx_monitoring_servers %}
@@ -19,3 +21,5 @@
 		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
 		fastcgi_pass unix:{{ nginx_pool_dir }}/{{ item.site }}.sock;
 	}
+
+    {% endif %}  
