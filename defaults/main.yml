@@ -111,20 +111,20 @@ nginx_certificate:
     ssl_certificate: '/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem'
     ssl_certificate_key: '/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key'
     alias:
-      ssl_certificate: '/etc/ssl/nginx/{{ item.site }}/{{ item.alias }}.pem'
-      ssl_certificate_key: '/etc/ssl/nginx/{{ item.site }}/{{ item.alias }}.key'
+      ssl_certificate: '/etc/ssl/nginx/{{ item.site }}/{{ item.name }}.pem'
+      ssl_certificate_key: '/etc/ssl/nginx/{{ item.site }}/{{ item.name }}.key'
   laravel:
     ssl_certificate: '/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem'
     ssl_certificate_key: '/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key'
     alias:
-      ssl_certificate: '/etc/ssl/nginx/{{ item.site }}/{{ item.alias }}.pem'
-      ssl_certificate_key: '/etc/ssl/nginx/{{ item.site }}/{{ item.alias }}.key'
+      ssl_certificate: '/etc/ssl/nginx/{{ item.site }}/{{ item.name }}.pem'
+      ssl_certificate_key: '/etc/ssl/nginx/{{ item.site }}/{{ item.name }}.key'
   static:
     ssl_certificate: '/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem'
     ssl_certificate_key: '/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key'
     alias:
-      ssl_certificate: '/etc/ssl/nginx/{{ item.site }}/{{ item.alias }}.pem'
-      ssl_certificate_key: '/etc/ssl/nginx/{{ item.site }}/{{ item.alias }}.key'
+      ssl_certificate: '/etc/ssl/nginx/{{ item.site }}/{{ item.name }}.pem'
+      ssl_certificate_key: '/etc/ssl/nginx/{{ item.site }}/{{ item.name }}.key'
 
 nginx_stacks:
   - proxmox
