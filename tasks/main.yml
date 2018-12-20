@@ -64,6 +64,7 @@
   become: true
   package:
     name: nginx
+    state: present
   notify:
     - start nginx
     - enabled nginx
