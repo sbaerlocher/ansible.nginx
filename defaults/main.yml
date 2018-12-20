@@ -110,12 +110,21 @@ nginx_certificate:
   wordpress:
     ssl_certificate: '/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem'
     ssl_certificate_key: '/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key'
+    alias:
+      ssl_certificate: '/etc/ssl/nginx/{{ item.site }}/{{ item.alias }}.pem'
+      ssl_certificate_key: '/etc/ssl/nginx/{{ item.site }}/{{ item.alias }}.key'
   laravel:
     ssl_certificate: '/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem'
     ssl_certificate_key: '/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key'
+    alias:
+      ssl_certificate: '/etc/ssl/nginx/{{ item.site }}/{{ item.alias }}.pem'
+      ssl_certificate_key: '/etc/ssl/nginx/{{ item.site }}/{{ item.alias }}.key'
   static:
     ssl_certificate: '/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.pem'
     ssl_certificate_key: '/etc/ssl/nginx/{{ item.site }}/{{ item.site }}.key'
+    alias:
+      ssl_certificate: '/etc/ssl/nginx/{{ item.site }}/{{ item.alias }}.pem'
+      ssl_certificate_key: '/etc/ssl/nginx/{{ item.site }}/{{ item.alias }}.key'
 
 nginx_stacks:
   - proxmox

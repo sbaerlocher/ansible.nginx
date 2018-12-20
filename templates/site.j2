@@ -105,8 +105,8 @@
         return 301 https://{{ alias.name }};
 
         ssl on;
-        ssl_certificate /etc/ssl/nginx/{{ item.site }}/{{ alias.name }}.pem;
-        ssl_certificate_key /etc/ssl/nginx/{{ item.site }}/{{ alias.name }}.key;
+        ssl_certificate {{ nginx_certificate[item.stack].alias.ssl_certificate }};
+        ssl_certificate_key {{ nginx_certificate[item.stack].alias.ssl_certificate_key }};
 
     }
 
@@ -121,8 +121,8 @@
         server_name {{ alias.name }};
 
         ssl on;
-        ssl_certificate {{ nginx_certificate[item.stack].ssl_certificate }};
-        ssl_certificate_key {{ nginx_certificate[item.stack].ssl_certificate_key }};
+        ssl_certificate {{ nginx_certificate[item.stack].alias.ssl_certificate }};
+        ssl_certificate_key {{ nginx_certificate[item.stack].alias.ssl_certificate_key }};
 
         {% include "default/status.j2" %}        
 
