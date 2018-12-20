@@ -60,11 +60,14 @@
   tags:
     - configuration
 
-- name: install nginx
+- name: install nginx package
   become: true
   package:
     name: nginx
     state: present
+  register: register_install_package
+  until: register_install_package is succeeded
+  retries: 3
   notify:
     - start nginx
     - enabled nginx
