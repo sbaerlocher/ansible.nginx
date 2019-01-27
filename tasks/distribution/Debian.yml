@@ -2,6 +2,7 @@
 # tasks file for sbaerlocher.nginx
 
 - name: "{{ ansible_distribution | lower }} | add key"
+  become: true
   apt_key:
     url: "http://nginx.org/keys/nginx_signing.key"
     state: present
@@ -9,6 +10,7 @@
     - packages
 
 - name: "{{ ansible_distribution | lower }} | add repository"
+  become: true
   apt_repository:
     repo: "deb http://nginx.org/packages{{ '/mainline' if nginx_branch == 'mainline' }}/{{ ansible_distribution | lower }}/ {{ ansible_distribution_release }} nginx"
     state: present
